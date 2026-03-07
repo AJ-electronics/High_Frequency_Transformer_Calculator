@@ -168,21 +168,26 @@ secondaryWire.appendChild(opt2)
 
 async function askAI(){
 
+document.getElementById("aiResults").innerText = "Analyzing design...";
+
 let designData = {
 
 Vin: vin.value,
 Vout: vout.value,
-Frequency: freq.value,
-Power: power.value,
+Frequency_kHz: freq.value,
+Power_W: power.value,
 Core: selectedCore.value,
+Material: material.value,
+FluxDensity_T: Buser.value,
 PrimaryTurns: resultsData.Np,
-SecondaryTurns: resultsData.Ns,
-FluxDensity: Buser.value
+SecondaryTurns: resultsData.Ns
 
-}
+};
+
+try{
 
 let response = await fetch(
-"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyA-etvwwztpw15UUqOc4C5P-RmY9K-uqk0",
+"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyA-etvwwztpw15UUqOc4C5P-RmY9K-uqk0",
 {
 method:"POST",
 
@@ -195,8 +200,21 @@ body:JSON.stringify({
 contents:[{
 parts:[{
 text:
-"You are an expert transformer design engineer. Analyze this transformer design and suggest improvements:\n"+
-JSON.stringify(designData)
+`You are an expert power electronics transformer designer.
+
+Analyze the following high frequency transformer design and give engineering suggestions.
+
+Design Data:
+${JSON.stringify(designData,null,2)}
+
+Check:
+- core selection
+- flux density
+- turns ratio
+- possible efficiency improvements
+- wire recommendations
+
+Return concise engineering advice.`
 }]
 }]
 
@@ -206,8 +224,20 @@ JSON.stringify(designData)
 
 let data = await response.json()
 
-let output = data.candidates[0].content.parts[0].text
+let output =
+data.candidates?.[0]?.content?.parts?.[0]?.text ||
+"No AI response received."
 
 document.getElementById("aiResults").innerText = output
 
 }
+
+catch(error){
+
+document.getElementById("aiResults").innerText =
+"AI request failed: " + error.message
+
+}
+
+}
+
