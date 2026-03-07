@@ -22,17 +22,39 @@ const cores={
 {name:"EE30",Ap:1.1,Ae:0.00009},
 {name:"EE40",Ap:2.6,Ae:0.000125},
 {name:"EE55",Ap:7.5,Ae:0.00025}
+],
+
+"RM":[
+{name:"RM8",Ap:0.7,Ae:0.00006},
+{name:"RM10",Ap:1.5,Ae:0.00009}
+],
+
+"PQ":[
+{name:"PQ26",Ap:1.2,Ae:0.00009},
+{name:"PQ32",Ap:3.1,Ae:0.00014}
+],
+
+"Toroidal":[
+{name:"T20",Ap:0.8,Ae:0.00008},
+{name:"T30",Ap:2.5,Ae:0.00015}
 ]
 
 }
 
 const awg={
+
+10:2.59,
+12:2.05,
+14:1.63,
+16:1.29,
+18:1.02,
 20:0.81,
 22:0.64,
 24:0.51,
 26:0.40,
 28:0.32,
 30:0.25
+
 }
 
 let resultsData={}
@@ -46,8 +68,8 @@ let P=parseFloat(power.value)
 
 let f=freqk*1000
 
-let coretype=coretype.value
 let material=material.value
+let coretype=coretype.value
 
 let Bmax=materials[material].bmax
 
@@ -56,6 +78,7 @@ let Ku=0.4
 let J=4e6
 
 let Ap=P/(Kw*Ku*Bmax*J*f)
+
 let Ap_cm4=Ap*1e8
 
 let corelist=cores[coretype]
@@ -81,12 +104,12 @@ selectedCore.appendChild(opt)
 }
 
 let fHz=freqk*1000
+
 let skindepth=66/Math.sqrt(fHz)
+
 let maxwire=2*skindepth
 
-populateWire()
-
-results.innerHTML=
+calcResults.innerHTML=
 
 `
 Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴<br><br>
@@ -100,6 +123,8 @@ Skin Depth: ${skindepth.toFixed(3)} mm<br>
 Maximum Wire Diameter: ${maxwire.toFixed(3)} mm
 `
 
+populateWire()
+
 resultsData={Vin,Vout,freqk,P,Ap_cm4,skindepth,maxwire}
 
 }
@@ -112,7 +137,7 @@ coreInfo.innerHTML=
 
 `
 Curie Temperature: ${materials[mat].curie} °C<br>
-Maximum Flux Density: ${materials[mat].bmax} T
+Maximum Flux Density: ${materials[mat].bmax} Tesla
 `
 
 }
@@ -126,6 +151,7 @@ let freqk=parseFloat(freq.value)
 let f=freqk*1000
 
 let coretype=coretype.value
+
 let coreName=selectedCore.value
 
 let core=cores[coretype].find(c=>c.name===coreName)
@@ -138,15 +164,17 @@ let Bmax=materials[material.value].bmax
 
 if(Buser>Bmax){
 
-alert("Flux density exceeds material limit")
+alert("Flux density exceeds maximum limit")
+
 return
 
 }
 
 let Np=Vin/(4*f*Buser*Ae)
+
 let Ns=Np*(Vout/Vin)
 
-results.innerHTML+=
+calcResults.innerHTML+=
 
 `
 <br>
@@ -232,6 +260,7 @@ let y=40
 for(let key in resultsData){
 
 doc.text(`${key}: ${resultsData[key]}`,20,y)
+
 y+=10
 
 }

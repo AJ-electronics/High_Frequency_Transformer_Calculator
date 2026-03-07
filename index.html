@@ -39,6 +39,9 @@ Core Type
 <select id="coretype">
 <option>ETD</option>
 <option>EE</option>
+<option>RM</option>
+<option>PQ</option>
+<option>Toroidal</option>
 </select>
 
 Material
@@ -50,7 +53,7 @@ Material
 <option>3F3</option>
 </select>
 
-Gap
+Core Gap
 <select id="gap">
 <option>Ungapped</option>
 <option>Gapped</option>
@@ -59,6 +62,8 @@ Gap
 <br><br>
 
 <button onclick="calculate()">Calculate</button>
+
+<div id="calcResults"></div>
 
 <hr>
 
@@ -89,12 +94,6 @@ Secondary Wire
 <button onclick="calculateStrands()">Calculate Strands</button>
 
 <div id="strandResult"></div>
-
-<hr>
-
-<h2>Results</h2>
-
-<div id="results"></div>
 
 <br>
 
