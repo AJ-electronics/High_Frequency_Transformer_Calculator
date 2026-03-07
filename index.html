@@ -2,6 +2,7 @@
 <html>
 
 <head>
+
 <meta charset="UTF-8">
 <title>High Frequency Transformer Calculator</title>
 
@@ -13,7 +14,7 @@
 
 <body>
 
-<h1>High Frequency Ferrite Transformer Calculator</h1>
+<h1>High Frequency Transformer Calculator</h1>
 
 <hr>
 
@@ -35,28 +36,45 @@ Power Rating (VA)
 
 <h2>Core Selection</h2>
 
+Topology
+<select id="topology" onchange="topologyCheck()">
+
+<option>Forward</option>
+<option>Half Bridge</option>
+<option>Full Bridge</option>
+<option>Push Pull</option>
+<option>Flyback</option>
+
+</select>
+
 Core Type
 <select id="coretype">
+
 <option>ETD</option>
 <option>EE</option>
 <option>RM</option>
 <option>PQ</option>
 <option>Toroidal</option>
+
 </select>
 
 Material
 <select id="material">
+
 <option>N87</option>
 <option>N97</option>
 <option>PC40</option>
 <option>3C90</option>
 <option>3F3</option>
+
 </select>
 
 Core Gap
 <select id="gap">
+
 <option>Ungapped</option>
 <option>Gapped</option>
+
 </select>
 
 <br><br>
@@ -82,6 +100,14 @@ Core Gap
 <button onclick="calculateTurns()">Calculate Turns</button>
 
 <div id="turnResults"></div>
+
+<h3>Inductance</h3>
+
+<div id="inductanceResults"></div>
+
+<h3>Core Loss</h3>
+
+<div id="coreLossResults"></div>
 
 <hr>
 

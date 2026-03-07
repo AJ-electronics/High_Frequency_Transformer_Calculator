@@ -1,42 +1,27 @@
 const materials={
 
-"N87":{curie:220,bmax:0.3},
-"N97":{curie:210,bmax:0.32},
-"PC40":{curie:230,bmax:0.35},
-"3C90":{curie:215,bmax:0.3},
-"3F3":{curie:230,bmax:0.35}
+"N87":{curie:220,bmax:0.3,k:3.2e-3,a:1.46,b:2.75},
+"N97":{curie:210,bmax:0.32,k:2.5e-3,a:1.45,b:2.7},
+"PC40":{curie:230,bmax:0.35,k:3e-3,a:1.5,b:2.8},
+"3C90":{curie:215,bmax:0.3,k:2.9e-3,a:1.45,b:2.75},
+"3F3":{curie:230,bmax:0.35,k:2.2e-3,a:1.44,b:2.6}
 
 }
 
 const cores={
 
 "ETD":[
-{name:"ETD29",Ap:0.65,Ae:0.00007},
-{name:"ETD39",Ap:2.4,Ae:0.000125},
-{name:"ETD44",Ap:4.5,Ae:0.000173},
-{name:"ETD49",Ap:7.8,Ae:0.000211},
-{name:"ETD59",Ap:17,Ae:0.000368}
+{name:"ETD29",Ap:0.65,Ae:0.00007,le:0.057},
+{name:"ETD39",Ap:2.4,Ae:0.000125,le:0.075},
+{name:"ETD44",Ap:4.5,Ae:0.000173,le:0.087},
+{name:"ETD49",Ap:7.8,Ae:0.000211,le:0.097},
+{name:"ETD59",Ap:17,Ae:0.000368,le:0.115}
 ],
 
 "EE":[
-{name:"EE30",Ap:1.1,Ae:0.00009},
-{name:"EE40",Ap:2.6,Ae:0.000125},
-{name:"EE55",Ap:7.5,Ae:0.00025}
-],
-
-"RM":[
-{name:"RM8",Ap:0.7,Ae:0.00006},
-{name:"RM10",Ap:1.5,Ae:0.00009}
-],
-
-"PQ":[
-{name:"PQ26",Ap:1.2,Ae:0.00009},
-{name:"PQ32",Ap:3.1,Ae:0.00014}
-],
-
-"Toroidal":[
-{name:"T20",Ap:0.8,Ae:0.00008},
-{name:"T30",Ap:2.5,Ae:0.00015}
+{name:"EE30",Ap:1.1,Ae:0.00009,le:0.060},
+{name:"EE40",Ap:2.6,Ae:0.000125,le:0.085},
+{name:"EE55",Ap:7.5,Ae:0.00025,le:0.120}
 ]
 
 }
@@ -67,6 +52,22 @@ const awg={
 
 let resultsData={}
 
+function topologyCheck(){
+
+let topology=document.getElementById("topology").value
+
+if(topology=="Flyback"){
+
+gap.value="Gapped"
+
+}else{
+
+gap.value="Ungapped"
+
+}
+
+}
+
 function calculate(){
 
 let Vin=parseFloat(vin.value)
@@ -76,7 +77,6 @@ let P=parseFloat(power.value)
 
 let f=freqk*1000
 
-let coreType=coretype.value
 let materialType=material.value
 
 let Bmax=materials[materialType].bmax
@@ -86,9 +86,10 @@ let Ku=0.4
 let J=4e6
 
 let Ap=P/(Kw*Ku*Bmax*J*f)
+
 let Ap_cm4=Ap*1e8
 
-let corelist=cores[coreType]
+let corelist=cores[coretype.value]
 
 selectedCore.innerHTML=""
 
@@ -111,68 +112,51 @@ selectedCore.appendChild(opt)
 }
 
 let fHz=freqk*1000
-
 let skindepth=66/Math.sqrt(fHz)
-
-let maxwire=2*skindepth
 
 calcResults.innerHTML=
 
 `
 Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴<br><br>
-
-Possible Cores:<br>
-${suggestions}
-
-<br>
-
-Skin Depth: ${skindepth.toFixed(3)} mm<br>
-Maximum Wire Diameter: ${maxwire.toFixed(3)} mm
+Possible Cores:<br>${suggestions}<br>
+Skin Depth: ${skindepth.toFixed(3)} mm
 `
 
 populateWire()
 
-resultsData={Vin,Vout,freqk,P,Ap_cm4,skindepth,maxwire}
+resultsData={Vin,Vout,freqk,P,Ap_cm4,skindepth}
 
 }
 
 function showCoreInfo(){
 
-let materialType=material.value
+let mat=material.value
 
 coreInfo.innerHTML=
 
 `
-Curie Temperature: ${materials[materialType].curie} °C<br>
-Maximum Flux Density: ${materials[materialType].bmax} Tesla
+Curie Temperature: ${materials[mat].curie} °C<br>
+Maximum Flux Density: ${materials[mat].bmax} T
 `
 
 }
 
 function calculateTurns(){
 
-let Vin=parseFloat(document.getElementById("vin").value)
-let Vout=parseFloat(document.getElementById("vout").value)
-let freqk=parseFloat(document.getElementById("freq").value)
+let Vin=parseFloat(vin.value)
+let Vout=parseFloat(vout.value)
+let freqk=parseFloat(freq.value)
 
 let f=freqk*1000
 
-let coreType=document.getElementById("coretype").value
-let coreName=document.getElementById("selectedCore").value
-
-let core=cores[coreType].find(c=>c.name===coreName)
-
-if(!core){
-alert("Please select a core first")
-return
-}
+let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
 
 let Ae=core.Ae
+let le=core.le
 
-let Binput=parseFloat(document.getElementById("Buser").value)
+let Binput=parseFloat(Buser.value)
 
-let materialType=document.getElementById("material").value
-let Bmax=materials[materialType].bmax
+let Bmax=materials[material.value].bmax
 
 if(Binput>Bmax){
 
@@ -184,17 +168,49 @@ return
 let Np=Vin/(4*f*Binput*Ae)
 let Ns=Np*(Vout/Vin)
 
-document.getElementById("turnResults").innerHTML=
+turnResults.innerHTML=
 
 `
 Primary Turns: ${Math.round(Np)}<br>
 Secondary Turns: ${Math.round(Ns)}
 `
 
+let mu0=4*Math.PI*1e-7
+let mur=2000
+
+let Lp=(mu0*mur*Math.pow(Np,2)*Ae)/le
+let Ls=(mu0*mur*Math.pow(Ns,2)*Ae)/le
+
+Lp=Lp*1e6
+Ls=Ls*1e6
+
+inductanceResults.innerHTML=
+
+`
+Primary Inductance: ${Lp.toFixed(2)} µH<br>
+Secondary Inductance: ${Ls.toFixed(2)} µH
+`
+
+let mat=materials[material.value]
+
+let freqHz=freqk*1000
+
+let coreLoss=mat.k*Math.pow(freqHz,mat.a)*Math.pow(Binput,mat.b)
+
+coreLossResults.innerHTML=
+
+`
+Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³
+`
+
 resultsData.Np=Math.round(Np)
 resultsData.Ns=Math.round(Ns)
+resultsData.Lp=Lp.toFixed(2)
+resultsData.Ls=Ls.toFixed(2)
+resultsData.coreLoss=coreLoss.toFixed(3)
 
 }
+
 function populateWire(){
 
 primaryWire.innerHTML=""
@@ -271,11 +287,6 @@ doc.text("https://aj-electronics.github.io/High_Frequency_Transformer_Calculator
 doc.line(20,38,190,38)
 
 let y=50
-
-doc.setFontSize(12)
-doc.text("Design Summary",20,y)
-
-y+=10
 
 doc.setFontSize(10)
 
