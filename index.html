@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 <meta charset="UTF-8">
 <title>High Frequency Transformer Calculator</title>
@@ -17,9 +18,7 @@
 <p>
 This calculator assists in designing ferrite transformers operating from
 10 kHz to several MHz using ferrite core families such as ETD, EE,
-Toroidal, RM and PQ. It calculates the minimum required core area product,
-suggests suitable cores, computes turns, evaluates skin depth and wire
-requirements.
+Toroidal, RM and PQ.
 </p>
 
 <hr>
@@ -38,6 +37,7 @@ Frequency (kHz)
 Power Rating (VA)
 <input id="power"><br>
 
+<hr>
 
 <h2>Core Selection</h2>
 
@@ -45,9 +45,6 @@ Core Type
 <select id="coretype">
 <option>ETD</option>
 <option>EE</option>
-<option>Toroidal</option>
-<option>RM</option>
-<option>PQ</option>
 </select>
 
 Material
@@ -59,15 +56,40 @@ Material
 <option>3F3</option>
 </select>
 
-Gap
-<select id="gap">
-<option>Ungapped</option>
-<option>Gapped</option>
-</select>
-
 <br><br>
 
 <button onclick="calculate()">Calculate</button>
+
+<hr>
+
+<h3>Select Core</h3>
+
+<select id="selectedCore" onchange="showCoreInfo()"></select>
+
+<div id="coreInfo"></div>
+
+<hr>
+
+<h3>Design Flux Density</h3>
+
+Flux Density (Tesla)
+<input id="Buser" value="0.2">
+
+<button onclick="calculateTurns()">Calculate Turns</button>
+
+<hr>
+
+<h3>Wire Selection</h3>
+
+Primary Wire
+<select id="primaryWire"></select>
+
+Secondary Wire
+<select id="secondaryWire"></select>
+
+<button onclick="calculateStrands()">Calculate Strands</button>
+
+<div id="strandResult"></div>
 
 <hr>
 
@@ -78,6 +100,8 @@ Gap
 <br>
 
 <button onclick="generatePDF()">Download PDF</button>
+
 <script src="script.js"></script>
+
 </body>
 </html>

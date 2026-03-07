@@ -7,13 +7,15 @@ background:#f4f4f4;
 }
 
 h1{
+
 color:#003366;
+
 }
 
 input,select{
 
-padding:5px;
-margin:5px;
+padding:6px;
+margin:6px;
 
 }
 
@@ -24,6 +26,13 @@ background:#0077cc;
 color:white;
 border:none;
 cursor:pointer;
+margin:10px 0;
+
+}
+
+button:hover{
+
+background:#005fa3;
 
 }
 
