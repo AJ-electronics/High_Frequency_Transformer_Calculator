@@ -151,34 +151,40 @@ Maximum Flux Density: ${materials[materialType].bmax} Tesla
 
 function calculateTurns(){
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let freqk=parseFloat(freq.value)
+let Vin=parseFloat(document.getElementById("vin").value)
+let Vout=parseFloat(document.getElementById("vout").value)
+let freqk=parseFloat(document.getElementById("freq").value)
 
 let f=freqk*1000
 
-let coreType=coretype.value
-let coreName=selectedCore.value
+let coreType=document.getElementById("coretype").value
+let coreName=document.getElementById("selectedCore").value
 
 let core=cores[coreType].find(c=>c.name===coreName)
 
+if(!core){
+alert("Please select a core first")
+return
+}
+
 let Ae=core.Ae
 
-let Buser=parseFloat(Buser.value)
+let Binput=parseFloat(document.getElementById("Buser").value)
 
-let Bmax=materials[material.value].bmax
+let materialType=document.getElementById("material").value
+let Bmax=materials[materialType].bmax
 
-if(Buser>Bmax){
+if(Binput>Bmax){
 
 alert("Flux density exceeds maximum limit")
 return
 
 }
 
-let Np=Vin/(4*f*Buser*Ae)
+let Np=Vin/(4*f*Binput*Ae)
 let Ns=Np*(Vout/Vin)
 
-turnResults.innerHTML=
+document.getElementById("turnResults").innerHTML=
 
 `
 Primary Turns: ${Math.round(Np)}<br>
@@ -189,7 +195,6 @@ resultsData.Np=Math.round(Np)
 resultsData.Ns=Math.round(Ns)
 
 }
-
 function populateWire(){
 
 primaryWire.innerHTML=""
