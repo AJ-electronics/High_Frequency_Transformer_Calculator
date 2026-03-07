@@ -37,15 +37,6 @@ const awg={
 
 let resultsData={}
 
-function topologyCheck(){
-
-if(topology.value=="Flyback")
-gap.value="Gapped"
-else
-gap.value="Ungapped"
-
-}
-
 function calculate(){
 
 let Vin=parseFloat(vin.value)
@@ -57,13 +48,10 @@ let f=freqk*1000
 
 let Bmax=materials[material.value].bmax
 
-/* Correct area product equation */
-
 let Ku=0.4
 let J=4e6
 
 let Ap=P/(Ku*J*Bmax*f)
-
 let Ap_cm4=Ap*1e8
 
 let corelist=cores[coretype.value]
@@ -78,7 +66,6 @@ for(let c of corelist){
 if(c.Ap>=Ap_cm4){
 
 found=true
-
 suggestions+=c.name+"<br>"
 
 let opt=document.createElement("option")
@@ -102,14 +89,10 @@ let skindepth=66/Math.sqrt(freqk*1000)
 calcResults.innerHTML=
 
 `
-Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴ <br><br>
-
+Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴<br><br>
 Possible Cores:<br>
-
 ${suggestions}
-
 <br>
-
 Skin Depth: ${skindepth.toFixed(3)} mm
 `
 
@@ -134,11 +117,6 @@ Maximum Flux Density: ${materials[mat].bmax} T
 
 function calculateTurns(){
 
-if(!selectedCore.value){
-alert("Please select a core")
-return
-}
-
 let Vin=parseFloat(vin.value)
 let Vout=parseFloat(vout.value)
 let freqk=parseFloat(freq.value)
@@ -156,36 +134,10 @@ let Np=Vin/(4*f*Binput*Ae)
 let Ns=Np*(Vout/Vin)
 
 turnResults.innerHTML=
-
-`
-Primary Turns: ${Math.round(Np)}<br>
-Secondary Turns: ${Math.round(Ns)}
-`
-
-let mu0=4*Math.PI*1e-7
-let mur=2000
-
-let Lp=(mu0*mur*Math.pow(Np,2)*Ae)/le
-Lp=Lp*1e6
-
-inductanceResults.innerHTML=
-
-`Magnetizing Inductance: ${Lp.toFixed(2)} µH`
-
-/* Steinmetz core loss */
-
-let mat=materials[material.value]
-
-let coreLoss=mat.k*Math.pow(freqk,mat.a)*Math.pow(Binput,mat.b)
-
-coreLossResults.innerHTML=
-
-`Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³`
+`Primary Turns: ${Math.round(Np)}<br>Secondary Turns: ${Math.round(Ns)}`
 
 resultsData.Np=Math.round(Np)
 resultsData.Ns=Math.round(Ns)
-resultsData.Lp=Lp.toFixed(2)
-resultsData.coreLoss=coreLoss.toFixed(3)
 
 }
 
@@ -214,101 +166,48 @@ secondaryWire.appendChild(opt2)
 
 }
 
-function calculateStrands(){
+async function askAI(){
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let P=parseFloat(power.value)
+let designData = {
 
-let Ip=P/Vin
-let Is=P/Vout
-
-let wireP=parseFloat(primaryWire.value)
-let wireS=parseFloat(secondaryWire.value)
-
-let AwireP=Math.PI*(wireP/2)**2
-let AwireS=Math.PI*(wireS/2)**2
-
-let strandsP=Math.ceil((Ip/4)/AwireP)
-let strandsS=Math.ceil((Is/4)/AwireS)
-
-strandResult.innerHTML=
-
-`
-Primary Strands: ${strandsP}<br>
-Secondary Strands: ${strandsS}
-`
-
-let maxCurrentP=4*AwireP*strandsP
-let maxCurrentS=4*AwireS*strandsS
-
-let rho=1.72e-8
-
-let length=0.15*(resultsData.Np+resultsData.Ns)
-
-let Rp=rho*length/(AwireP*1e-6*strandsP)
-let Rs=rho*length/(AwireS*1e-6*strandsS)
-
-let copperLoss=Ip*Ip*Rp + Is*Is*Rs
-
-copperLossResults.innerHTML=
-
-`
-Max Primary Current: ${maxCurrentP.toFixed(2)} A<br>
-Max Secondary Current: ${maxCurrentS.toFixed(2)} A<br>
-Estimated Copper Loss: ${copperLoss.toFixed(3)} W
-`
-
-let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
-
-let totalCopper=
-(resultsData.Np*AwireP*strandsP +
-resultsData.Ns*AwireS*strandsS)*1e-6
-
-let fill=totalCopper/core.Aw
-
-designChecks.innerHTML=
-
-`
-Window Fill Factor: ${(fill*100).toFixed(1)} %<br>
-Recommended < 40 %
-`
-
-resultsData.strandsP=strandsP
-resultsData.strandsS=strandsS
-resultsData.copperLoss=copperLoss.toFixed(3)
-
-pdfBtn.style.display="block"
+Vin: vin.value,
+Vout: vout.value,
+Frequency: freq.value,
+Power: power.value,
+Core: selectedCore.value,
+PrimaryTurns: resultsData.Np,
+SecondaryTurns: resultsData.Ns,
+FluxDensity: Buser.value
 
 }
 
-function generatePDF(){
+let response = await fetch(
+"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyA-etvwwztpw15UUqOc4C5P-RmY9K-uqk0",
+{
+method:"POST",
 
-const {jsPDF}=window.jspdf
+headers:{
+"Content-Type":"application/json"
+},
 
-let doc=new jsPDF()
+body:JSON.stringify({
 
-doc.setFontSize(16)
-doc.text("AJ Electronics",20,20)
+contents:[{
+parts:[{
+text:
+"You are an expert transformer design engineer. Analyze this transformer design and suggest improvements:\n"+
+JSON.stringify(designData)
+}]
+}]
 
-doc.setFontSize(11)
-doc.text("High Frequency Transformer Calculator",20,28)
+})
 
-doc.line(20,35,190,35)
+})
 
-let y=45
+let data = await response.json()
 
-doc.setFontSize(10)
+let output = data.candidates[0].content.parts[0].text
 
-for(let key in resultsData){
-
-doc.text(`${key}`,20,y)
-doc.text(`${resultsData[key]}`,120,y)
-
-y+=8
-
-}
-
-doc.save("Transformer_Design_Report.pdf")
+document.getElementById("aiResults").innerText = output
 
 }

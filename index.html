@@ -37,7 +37,7 @@ Power Rating (VA)
 <h2>Core Selection</h2>
 
 Topology
-<select id="topology" onchange="topologyCheck()">
+<select id="topology">
 <option>Forward</option>
 <option>Half Bridge</option>
 <option>Full Bridge</option>
@@ -115,6 +115,14 @@ Secondary Wire
 
 <h3>Design Checks</h3>
 <div id="designChecks"></div>
+
+<hr>
+
+<h3>AI Transformer Design Assistant</h3>
+
+<button onclick="askAI()">Analyze Design</button>
+
+<div id="aiResults"></div>
 
 <br>
 
