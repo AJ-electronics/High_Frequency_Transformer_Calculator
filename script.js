@@ -1,10 +1,10 @@
 const materials={
 
-"N87":{curie:220,bmax:0.3,k:3.2,a:1.46,b:2.75},
-"N97":{curie:210,bmax:0.32,k:2.5,a:1.45,b:2.7},
-"PC40":{curie:230,bmax:0.35,k:3,a:1.5,b:2.8},
-"3C90":{curie:215,bmax:0.3,k:2.9,a:1.45,b:2.75},
-"3F3":{curie:230,bmax:0.35,k:2.2,a:1.44,b:2.6}
+"N87":{curie:220,bmax:0.3,k:3.2e-3,a:1.46,b:2.75},
+"N97":{curie:210,bmax:0.32,k:2.5e-3,a:1.45,b:2.7},
+"PC40":{curie:230,bmax:0.35,k:3e-3,a:1.5,b:2.8},
+"3C90":{curie:215,bmax:0.3,k:2.9e-3,a:1.45,b:2.75},
+"3F3":{curie:230,bmax:0.35,k:2.2e-3,a:1.44,b:2.6}
 
 }
 
@@ -57,11 +57,13 @@ let f=freqk*1000
 
 let Bmax=materials[material.value].bmax
 
-let Kw=0.5
-let Ku=0.4
-let J=4
+/* Correct area product equation */
 
-let Ap=P/(Kw*Ku*Bmax*J*f)
+let Ku=0.4
+let J=4e6
+
+let Ap=P/(Ku*J*Bmax*f)
+
 let Ap_cm4=Ap*1e8
 
 let corelist=cores[coretype.value]
@@ -69,10 +71,13 @@ let corelist=cores[coretype.value]
 selectedCore.innerHTML=""
 
 let suggestions=""
+let found=false
 
 for(let c of corelist){
 
 if(c.Ap>=Ap_cm4){
+
+found=true
 
 suggestions+=c.name+"<br>"
 
@@ -86,15 +91,25 @@ selectedCore.appendChild(opt)
 
 }
 
+if(!found){
+
+suggestions="No core large enough."
+
+}
+
 let skindepth=66/Math.sqrt(freqk*1000)
 
 calcResults.innerHTML=
 
 `
-Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴<br><br>
+Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴ <br><br>
+
 Possible Cores:<br>
+
 ${suggestions}
+
 <br>
+
 Skin Depth: ${skindepth.toFixed(3)} mm
 `
 
@@ -119,6 +134,11 @@ Maximum Flux Density: ${materials[mat].bmax} T
 
 function calculateTurns(){
 
+if(!selectedCore.value){
+alert("Please select a core")
+return
+}
+
 let Vin=parseFloat(vin.value)
 let Vout=parseFloat(vout.value)
 let freqk=parseFloat(freq.value)
@@ -136,7 +156,11 @@ let Np=Vin/(4*f*Binput*Ae)
 let Ns=Np*(Vout/Vin)
 
 turnResults.innerHTML=
-`Primary Turns: ${Math.round(Np)}<br>Secondary Turns: ${Math.round(Ns)}`
+
+`
+Primary Turns: ${Math.round(Np)}<br>
+Secondary Turns: ${Math.round(Ns)}
+`
 
 let mu0=4*Math.PI*1e-7
 let mur=2000
@@ -145,13 +169,17 @@ let Lp=(mu0*mur*Math.pow(Np,2)*Ae)/le
 Lp=Lp*1e6
 
 inductanceResults.innerHTML=
+
 `Magnetizing Inductance: ${Lp.toFixed(2)} µH`
+
+/* Steinmetz core loss */
 
 let mat=materials[material.value]
 
 let coreLoss=mat.k*Math.pow(freqk,mat.a)*Math.pow(Binput,mat.b)
 
 coreLossResults.innerHTML=
+
 `Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³`
 
 resultsData.Np=Math.round(Np)
@@ -198,11 +226,11 @@ let Is=P/Vout
 let wireP=parseFloat(primaryWire.value)
 let wireS=parseFloat(secondaryWire.value)
 
-let AwireP_mm2=Math.PI*(wireP/2)**2
-let AwireS_mm2=Math.PI*(wireS/2)**2
+let AwireP=Math.PI*(wireP/2)**2
+let AwireS=Math.PI*(wireS/2)**2
 
-let strandsP=Math.ceil((Ip/4)/AwireP_mm2)
-let strandsS=Math.ceil((Is/4)/AwireS_mm2)
+let strandsP=Math.ceil((Ip/4)/AwireP)
+let strandsS=Math.ceil((Is/4)/AwireS)
 
 strandResult.innerHTML=
 
@@ -211,14 +239,15 @@ Primary Strands: ${strandsP}<br>
 Secondary Strands: ${strandsS}
 `
 
-let maxCurrentP=4*AwireP_mm2*strandsP
-let maxCurrentS=4*AwireS_mm2*strandsS
+let maxCurrentP=4*AwireP*strandsP
+let maxCurrentS=4*AwireS*strandsS
 
 let rho=1.72e-8
-let length=0.2*(resultsData.Np+resultsData.Ns)
 
-let Rp=rho*length/(AwireP_mm2*1e-6*strandsP)
-let Rs=rho*length/(AwireS_mm2*1e-6*strandsS)
+let length=0.15*(resultsData.Np+resultsData.Ns)
+
+let Rp=rho*length/(AwireP*1e-6*strandsP)
+let Rs=rho*length/(AwireS*1e-6*strandsS)
 
 let copperLoss=Ip*Ip*Rp + Is*Is*Rs
 
@@ -233,8 +262,8 @@ Estimated Copper Loss: ${copperLoss.toFixed(3)} W
 let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
 
 let totalCopper=
-(resultsData.Np*AwireP_mm2*strandsP +
-resultsData.Ns*AwireS_mm2*strandsS)*1e-6
+(resultsData.Np*AwireP*strandsP +
+resultsData.Ns*AwireS*strandsS)*1e-6
 
 let fill=totalCopper/core.Aw
 
@@ -242,7 +271,7 @@ designChecks.innerHTML=
 
 `
 Window Fill Factor: ${(fill*100).toFixed(1)} %<br>
-Recommended: < 40 %
+Recommended < 40 %
 `
 
 resultsData.strandsP=strandsP
