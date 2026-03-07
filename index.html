@@ -15,12 +15,6 @@
 
 <h1>High Frequency Ferrite Transformer Calculator</h1>
 
-<p>
-This calculator assists in designing ferrite transformers operating from
-10 kHz to several MHz using ferrite core families such as ETD, EE,
-Toroidal, RM and PQ.
-</p>
-
 <hr>
 
 <h2>Electrical Parameters</h2>
@@ -56,6 +50,12 @@ Material
 <option>3F3</option>
 </select>
 
+Gap
+<select id="gap">
+<option>Ungapped</option>
+<option>Gapped</option>
+</select>
+
 <br><br>
 
 <button onclick="calculate()">Calculate</button>
@@ -72,7 +72,6 @@ Material
 
 <h3>Design Flux Density</h3>
 
-Flux Density (Tesla)
 <input id="Buser" value="0.2">
 
 <button onclick="calculateTurns()">Calculate Turns</button>
@@ -99,7 +98,9 @@ Secondary Wire
 
 <br>
 
-<button onclick="generatePDF()">Download PDF</button>
+<button id="pdfBtn" onclick="generatePDF()" style="display:none;">
+Download PDF
+</button>
 
 <script src="script.js"></script>
 
