@@ -1,4 +1,4 @@
-const materials={
+const materials = {
 
 "N87":{curie:220,bmax:0.3},
 "N97":{curie:210,bmax:0.32},
@@ -8,7 +8,7 @@ const materials={
 
 }
 
-const cores={
+const cores = {
 
 "ETD":[
 {name:"ETD29",Ap:0.65,Ae:0.00007},
@@ -41,7 +41,7 @@ const cores={
 
 }
 
-const awg={
+const awg = {
 
 10:2.59,
 12:2.05,
@@ -57,59 +57,57 @@ const awg={
 
 }
 
-let resultsData={}
+let resultsData = {}
 
 function calculate(){
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let freqk=parseFloat(freq.value)
-let P=parseFloat(power.value)
+let Vin = parseFloat(document.getElementById("vin").value)
+let Vout = parseFloat(document.getElementById("vout").value)
+let freqk = parseFloat(document.getElementById("freq").value)
+let P = parseFloat(document.getElementById("power").value)
 
-let f=freqk*1000
+let f = freqk * 1000
 
-let material=material.value
-let coretype=coretype.value
+let coreType = document.getElementById("coretype").value
+let materialType = document.getElementById("material").value
 
-let Bmax=materials[material].bmax
+let Bmax = materials[materialType].bmax
 
-let Kw=0.5
-let Ku=0.4
-let J=4e6
+let Kw = 0.5
+let Ku = 0.4
+let J = 4e6
 
-let Ap=P/(Kw*Ku*Bmax*J*f)
+let Ap = P / (Kw * Ku * Bmax * J * f)
+let Ap_cm4 = Ap * 1e8
 
-let Ap_cm4=Ap*1e8
+let corelist = cores[coreType]
 
-let corelist=cores[coretype]
+let dropdown = document.getElementById("selectedCore")
+dropdown.innerHTML = ""
 
-selectedCore.innerHTML=""
-
-let suggestions=""
+let suggestions = ""
 
 for(let c of corelist){
 
-if(c.Ap>=Ap_cm4){
+if(c.Ap >= Ap_cm4){
 
-suggestions+=c.name+"<br>"
+suggestions += c.name + "<br>"
 
-let opt=document.createElement("option")
-opt.text=c.name
-opt.value=c.name
+let opt = document.createElement("option")
+opt.text = c.name
+opt.value = c.name
 
-selectedCore.appendChild(opt)
-
-}
+dropdown.appendChild(opt)
 
 }
 
-let fHz=freqk*1000
+}
 
-let skindepth=66/Math.sqrt(fHz)
+let fHz = freqk * 1000
+let skindepth = 66 / Math.sqrt(fHz)
+let maxwire = 2 * skindepth
 
-let maxwire=2*skindepth
-
-calcResults.innerHTML=
+document.getElementById("calcResults").innerHTML =
 
 `
 Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴<br><br>
@@ -125,56 +123,54 @@ Maximum Wire Diameter: ${maxwire.toFixed(3)} mm
 
 populateWire()
 
-resultsData={Vin,Vout,freqk,P,Ap_cm4,skindepth,maxwire}
+resultsData = {Vin,Vout,freqk,P,Ap_cm4,skindepth,maxwire}
 
 }
 
 function showCoreInfo(){
 
-let mat=material.value
+let materialType = document.getElementById("material").value
 
-coreInfo.innerHTML=
+document.getElementById("coreInfo").innerHTML =
 
 `
-Curie Temperature: ${materials[mat].curie} °C<br>
-Maximum Flux Density: ${materials[mat].bmax} Tesla
+Curie Temperature: ${materials[materialType].curie} °C<br>
+Maximum Flux Density: ${materials[materialType].bmax} Tesla
 `
 
 }
 
 function calculateTurns(){
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let freqk=parseFloat(freq.value)
+let Vin = parseFloat(document.getElementById("vin").value)
+let Vout = parseFloat(document.getElementById("vout").value)
+let freqk = parseFloat(document.getElementById("freq").value)
 
-let f=freqk*1000
+let f = freqk * 1000
 
-let coretype=coretype.value
+let coreType = document.getElementById("coretype").value
+let coreName = document.getElementById("selectedCore").value
 
-let coreName=selectedCore.value
+let core = cores[coreType].find(c=>c.name===coreName)
 
-let core=cores[coretype].find(c=>c.name===coreName)
+let Ae = core.Ae
 
-let Ae=core.Ae
+let Buser = parseFloat(document.getElementById("Buser").value)
 
-let Buser=parseFloat(Buser.value)
+let materialType = document.getElementById("material").value
+let Bmax = materials[materialType].bmax
 
-let Bmax=materials[material.value].bmax
+if(Buser > Bmax){
 
-if(Buser>Bmax){
-
-alert("Flux density exceeds maximum limit")
-
+alert("Flux density exceeds maximum material limit")
 return
 
 }
 
-let Np=Vin/(4*f*Buser*Ae)
+let Np = Vin/(4*f*Buser*Ae)
+let Ns = Np*(Vout/Vin)
 
-let Ns=Np*(Vout/Vin)
-
-calcResults.innerHTML+=
+document.getElementById("calcResults").innerHTML +=
 
 `
 <br>
@@ -182,15 +178,18 @@ Primary Turns: ${Math.round(Np)}<br>
 Secondary Turns: ${Math.round(Ns)}
 `
 
-resultsData.Np=Math.round(Np)
-resultsData.Ns=Math.round(Ns)
+resultsData.Np = Math.round(Np)
+resultsData.Ns = Math.round(Ns)
 
 }
 
 function populateWire(){
 
-primaryWire.innerHTML=""
-secondaryWire.innerHTML=""
+let pw = document.getElementById("primaryWire")
+let sw = document.getElementById("secondaryWire")
+
+pw.innerHTML=""
+sw.innerHTML=""
 
 for(let g in awg){
 
@@ -200,13 +199,13 @@ let opt1=document.createElement("option")
 opt1.text=text
 opt1.value=awg[g]
 
-primaryWire.appendChild(opt1)
+pw.appendChild(opt1)
 
 let opt2=document.createElement("option")
 opt2.text=text
 opt2.value=awg[g]
 
-secondaryWire.appendChild(opt2)
+sw.appendChild(opt2)
 
 }
 
@@ -214,15 +213,15 @@ secondaryWire.appendChild(opt2)
 
 function calculateStrands(){
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let P=parseFloat(power.value)
+let Vin=parseFloat(document.getElementById("vin").value)
+let Vout=parseFloat(document.getElementById("vout").value)
+let P=parseFloat(document.getElementById("power").value)
 
 let Ip=P/Vin
 let Is=P/Vout
 
-let wireP=parseFloat(primaryWire.value)
-let wireS=parseFloat(secondaryWire.value)
+let wireP=parseFloat(document.getElementById("primaryWire").value)
+let wireS=parseFloat(document.getElementById("secondaryWire").value)
 
 let AwireP=Math.PI*(wireP/2)**2
 let AwireS=Math.PI*(wireS/2)**2
@@ -233,7 +232,7 @@ let areaS=Is/4
 let strandsP=Math.ceil(areaP/AwireP)
 let strandsS=Math.ceil(areaS/AwireS)
 
-strandResult.innerHTML=
+document.getElementById("strandResult").innerHTML=
 
 `
 Primary Strands: ${strandsP}<br>
@@ -243,7 +242,7 @@ Secondary Strands: ${strandsS}
 resultsData.strandsP=strandsP
 resultsData.strandsS=strandsS
 
-pdfBtn.style.display="block"
+document.getElementById("pdfBtn").style.display="block"
 
 }
 
@@ -268,7 +267,6 @@ y+=10
 doc.setTextColor(200,200,200)
 
 doc.text("AJ Electronics",70,150)
-
 doc.text("https://aj-electronics.github.io/High_Frequency_Transformer_Calculator/",20,280)
 
 doc.save("transformer_design.pdf")
