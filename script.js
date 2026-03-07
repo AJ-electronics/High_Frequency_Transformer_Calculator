@@ -59,13 +59,11 @@ let corelist=cores[coretype.value]
 selectedCore.innerHTML=""
 
 let suggestions=""
-let found=false
 
 for(let c of corelist){
 
 if(c.Ap>=Ap_cm4){
 
-found=true
 suggestions+=c.name+"<br>"
 
 let opt=document.createElement("option")
@@ -75,12 +73,6 @@ opt.value=c.name
 selectedCore.appendChild(opt)
 
 }
-
-}
-
-if(!found){
-
-suggestions="No core large enough."
 
 }
 
@@ -133,11 +125,36 @@ let Binput=parseFloat(Buser.value)
 let Np=Vin/(4*f*Binput*Ae)
 let Ns=Np*(Vout/Vin)
 
-turnResults.innerHTML=
-`Primary Turns: ${Math.round(Np)}<br>Secondary Turns: ${Math.round(Ns)}`
+Np=Math.round(Np)
+Ns=Math.round(Ns)
 
-resultsData.Np=Math.round(Np)
-resultsData.Ns=Math.round(Ns)
+turnResults.innerHTML=
+
+`Primary Turns: ${Np}<br>Secondary Turns: ${Ns}`
+
+resultsData.Np=Np
+resultsData.Ns=Ns
+
+let mu0=4*Math.PI*1e-7
+let mur=2000
+
+let Lp=(mu0*mur*Math.pow(Np,2)*Ae)/le
+Lp=Lp*1e6
+
+inductanceResults.innerHTML=
+
+`Magnetizing Inductance: ${Lp.toFixed(2)} µH`
+
+let mat=materials[material.value]
+
+let coreLoss=
+mat.k*Math.pow(freqk,mat.a)*Math.pow(Binput,mat.b)
+
+coreLossResults.innerHTML=
+
+`Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³`
+
+resultsData.coreLoss=coreLoss
 
 }
 
@@ -166,27 +183,56 @@ secondaryWire.appendChild(opt2)
 
 }
 
+function calculateStrands(){
+
+let Vin=parseFloat(vin.value)
+let Vout=parseFloat(vout.value)
+let P=parseFloat(power.value)
+
+let Ip=P/Vin
+let Is=P/Vout
+
+let wireP=parseFloat(primaryWire.value)
+let wireS=parseFloat(secondaryWire.value)
+
+let AwireP=Math.PI*(wireP/2)**2
+let AwireS=Math.PI*(wireS/2)**2
+
+let strandsP=Math.ceil((Ip/4)/AwireP)
+let strandsS=Math.ceil((Is/4)/AwireS)
+
+strandResult.innerHTML=
+
+`
+Primary Strands: ${strandsP}<br>
+Secondary Strands: ${strandsS}
+`
+
+pdfBtn.style.display="block"
+
+}
+
 async function askAI(){
 
-document.getElementById("aiResults").innerText = "Analyzing design...";
+document.getElementById("aiResults").innerText="Analyzing design..."
 
-let designData = {
+let designData={
 
-Vin: vin.value,
-Vout: vout.value,
-Frequency_kHz: freq.value,
-Power_W: power.value,
-Core: selectedCore.value,
-Material: material.value,
-FluxDensity_T: Buser.value,
-PrimaryTurns: resultsData.Np,
-SecondaryTurns: resultsData.Ns
+Vin:vin.value,
+Vout:vout.value,
+Frequency_kHz:freq.value,
+Power_W:power.value,
+Core:selectedCore.value,
+Material:material.value,
+FluxDensity_T:Buser.value,
+PrimaryTurns:resultsData.Np,
+SecondaryTurns:resultsData.Ns
 
-};
+}
 
 try{
 
-let response = await fetch(
+let response=await fetch(
 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyA-etvwwztpw15UUqOc4C5P-RmY9K-uqk0",
 {
 method:"POST",
@@ -200,21 +246,14 @@ body:JSON.stringify({
 contents:[{
 parts:[{
 text:
-`You are an expert power electronics transformer designer.
+`You are an expert SMPS transformer designer.
 
-Analyze the following high frequency transformer design and give engineering suggestions.
+Analyze the following transformer design and suggest improvements.
 
 Design Data:
 ${JSON.stringify(designData,null,2)}
 
-Check:
-- core selection
-- flux density
-- turns ratio
-- possible efficiency improvements
-- wire recommendations
-
-Return concise engineering advice.`
+Check core selection, flux density, and efficiency.`
 }]
 }]
 
@@ -222,22 +261,39 @@ Return concise engineering advice.`
 
 })
 
-let data = await response.json()
+let data=await response.json()
 
-let output =
-data.candidates?.[0]?.content?.parts?.[0]?.text ||
-"No AI response received."
+let output=data?.candidates?.[0]?.content?.parts?.[0]?.text || "No AI response."
 
-document.getElementById("aiResults").innerText = output
+document.getElementById("aiResults").innerText=output
 
 }
 
-catch(error){
+catch(e){
 
-document.getElementById("aiResults").innerText =
-"AI request failed: " + error.message
+document.getElementById("aiResults").innerText="AI request failed."
 
 }
 
 }
 
+function generatePDF(){
+
+const {jsPDF}=window.jspdf
+
+let doc=new jsPDF()
+
+doc.text("Transformer Design Report",20,20)
+
+let y=40
+
+for(let k in resultsData){
+
+doc.text(`${k}: ${resultsData[k]}`,20,y)
+y+=10
+
+}
+
+doc.save("transformer_design.pdf")
+
+}

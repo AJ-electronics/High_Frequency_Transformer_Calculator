@@ -1,6 +1,6 @@
 body{
 
-font-family: Arial;
+font-family:Arial;
 margin:40px;
 background:#f4f4f4;
 
@@ -41,17 +41,9 @@ margin-top:20px;
 
 }
 
-#turnResults{
-
-background:white;
-padding:10px;
-margin-top:10px;
-
-}
-
 #aiResults{
 
-background:#ffffff;
+background:white;
 padding:15px;
 margin-top:10px;
 border-left:4px solid #0077cc;
