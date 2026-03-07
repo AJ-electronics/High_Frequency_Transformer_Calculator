@@ -111,8 +111,7 @@ selectedCore.appendChild(opt)
 
 }
 
-let fHz=freqk*1000
-let skindepth=66/Math.sqrt(fHz)
+let skindepth=66/Math.sqrt(freqk*1000)
 
 calcResults.innerHTML=
 
@@ -124,7 +123,7 @@ Skin Depth: ${skindepth.toFixed(3)} mm
 
 populateWire()
 
-resultsData={Vin,Vout,freqk,P,Ap_cm4,skindepth}
+resultsData={Vin,Vout,freqk,P,Ap_cm4}
 
 }
 
@@ -143,84 +142,73 @@ Maximum Flux Density: ${materials[mat].bmax} T
 
 function calculateTurns(){
 
-let Vin = parseFloat(document.getElementById("vin").value)
-let Vout = parseFloat(document.getElementById("vout").value)
-let freqk = parseFloat(document.getElementById("freq").value)
+let Vin=parseFloat(vin.value)
+let Vout=parseFloat(vout.value)
+let freqk=parseFloat(freq.value)
 
-let f = freqk * 1000
+let f=freqk*1000
 
-let coreType = document.getElementById("coretype").value
-let coreName = document.getElementById("selectedCore").value
+let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
 
-let core = cores[coreType].find(c => c.name === coreName)
+let Ae=core.Ae
+let le=core.le
 
-if(!core){
-alert("Please select a core first")
-return
-}
+let Binput=parseFloat(Buser.value)
 
-let Ae = core.Ae
-let le = core.le
+let Bmax=materials[material.value].bmax
 
-let Binput = parseFloat(document.getElementById("Buser").value)
+if(Binput>Bmax){
 
-let materialType = document.getElementById("material").value
-let Bmax = materials[materialType].bmax
-
-if(Binput > Bmax){
 alert("Flux density exceeds maximum limit")
 return
+
 }
 
-let Np = Vin/(4*f*Binput*Ae)
-let Ns = Np*(Vout/Vin)
+let Np=Vin/(4*f*Binput*Ae)
+let Ns=Np*(Vout/Vin)
 
-document.getElementById("turnResults").innerHTML =
+turnResults.innerHTML=
+
 `
-Primary Turns: ${Math.round(Np)} <br>
+Primary Turns: ${Math.round(Np)}<br>
 Secondary Turns: ${Math.round(Ns)}
 `
 
-/* ---------- Inductance ---------- */
+let mu0=4*Math.PI*1e-7
+let mur=2000
 
-let mu0 = 4*Math.PI*1e-7
-let mur = 2000
+let Lp=(mu0*mur*Math.pow(Np,2)*Ae)/le
+Lp=Lp*1e6
 
-let Lp = (mu0*mur*Math.pow(Np,2)*Ae)/le
+let ratio=Ns/Np
 
-Lp = Lp*1e6
-
-let turnsRatio = Ns/Np
-
-let Ls = Lp*Math.pow(turnsRatio,2)
-
-document.getElementById("inductanceResults").innerHTML=
+inductanceResults.innerHTML=
 
 `
 Magnetizing Inductance: ${Lp.toFixed(2)} µH<br>
-Reflected Secondary Inductance: ${Ls.toFixed(2)} µH
+Turns Ratio: ${ratio.toFixed(2)} : 1
 `
 
-/* ---------- Core Loss ---------- */
+let mat=materials[material.value]
 
-let mat = materials[materialType]
+let freqMHz=freqk/1000
 
-let freqHz = freqk/1000
+let coreLoss=mat.k*Math.pow(freqMHz,mat.a)*Math.pow(Binput,mat.b)
 
-let coreLoss = k * Math.pow(freqMHz,a) * Math.pow(Binput,b)
+coreLossResults.innerHTML=
 
-document.getElementById("coreLossResults").innerHTML =
 `
 Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³
 `
 
-resultsData.Np = Math.round(Np)
-resultsData.Ns = Math.round(Ns)
-resultsData.Lp = Lp.toFixed(2)
-resultsData.Ls = Ls.toFixed(2)
-resultsData.coreLoss = coreLoss.toFixed(3)
+resultsData.Np=Math.round(Np)
+resultsData.Ns=Math.round(Ns)
+resultsData.Lp=Lp.toFixed(2)
+resultsData.turnsRatio=ratio.toFixed(2)
+resultsData.coreLoss=coreLoss.toFixed(3)
 
 }
+
 function populateWire(){
 
 primaryWire.innerHTML=""
