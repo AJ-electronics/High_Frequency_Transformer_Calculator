@@ -1,4 +1,3 @@
-
 const materials = {
 
 "N87":{curie:220,bmax:0.3},
@@ -29,12 +28,12 @@ const cores = {
 
 const awg = {
 
-"20":0.81,
-"22":0.64,
-"24":0.51,
-"26":0.40,
-"28":0.32,
-"30":0.25
+20:0.81,
+22:0.64,
+24:0.51,
+26:0.40,
+28:0.32,
+30:0.25
 
 }
 
@@ -42,7 +41,10 @@ function calculate(){
 
 let Vin=parseFloat(document.getElementById("vin").value)
 let Vout=parseFloat(document.getElementById("vout").value)
-let f=parseFloat(document.getElementById("freq").value)*1000
+let freqk=parseFloat(document.getElementById("freq").value)
+
+let f=freqk*1000
+
 let P=parseFloat(document.getElementById("power").value)
 
 let coretype=document.getElementById("coretype").value
@@ -50,11 +52,13 @@ let material=document.getElementById("material").value
 
 let Bmax=materials[material].bmax
 
-let Kw=0.4
-let Ku=0.3
-let J=4000000
+let Kw=0.5
+let Ku=0.4
+let J=4e6
 
 let Ap=P/(Kw*Ku*Bmax*J*f)
+
+let Ap_cm4=Ap*1e8
 
 let corelist=cores[coretype]
 
@@ -62,7 +66,7 @@ let suggestions=""
 
 for(let c of corelist){
 
-if(c.Ap>=Ap){
+if(c.Ap>=Ap_cm4){
 
 suggestions+=c.name+"<br>"
 
@@ -75,17 +79,18 @@ let Ae=corelist[0].Ae
 let Buser=0.2
 
 let Np=Vin/(4*f*Buser*Ae)
+
 let Ns=Np*(Vout/Vin)
 
-let freqk=document.getElementById("freq").value
+let fHz=freqk*1000
 
-let skindepth=66/Math.sqrt(freqk)
+let skindepth=66/Math.sqrt(fHz)
 
 let maxwire=2*skindepth
 
 let result=`
 
-Minimum Area Product: ${Ap.toFixed(4)} m^4 <br><br>
+Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴ <br><br>
 
 Possible Cores:<br>
 ${suggestions}
