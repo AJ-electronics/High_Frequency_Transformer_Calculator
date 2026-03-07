@@ -38,40 +38,32 @@ Power Rating (VA)
 
 Topology
 <select id="topology" onchange="topologyCheck()">
-
 <option>Forward</option>
 <option>Half Bridge</option>
 <option>Full Bridge</option>
 <option>Push Pull</option>
 <option>Flyback</option>
-
 </select>
 
 Core Type
 <select id="coretype">
-
 <option>ETD</option>
 <option>EE</option>
-
 </select>
 
 Material
 <select id="material">
-
 <option>N87</option>
 <option>N97</option>
 <option>PC40</option>
 <option>3C90</option>
 <option>3F3</option>
-
 </select>
 
 Core Gap
 <select id="gap">
-
 <option>Ungapped</option>
 <option>Gapped</option>
-
 </select>
 
 <br><br>
@@ -99,11 +91,9 @@ Core Gap
 <div id="turnResults"></div>
 
 <h3>Inductance</h3>
-
 <div id="inductanceResults"></div>
 
 <h3>Core Loss</h3>
-
 <div id="coreLossResults"></div>
 
 <hr>
@@ -119,6 +109,12 @@ Secondary Wire
 <button onclick="calculateStrands()">Calculate Strands</button>
 
 <div id="strandResult"></div>
+
+<h3>Copper Loss</h3>
+<div id="copperLossResults"></div>
+
+<h3>Design Checks</h3>
+<div id="designChecks"></div>
 
 <br>
 
