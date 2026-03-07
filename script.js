@@ -187,15 +187,18 @@ let mu0 = 4*Math.PI*1e-7
 let mur = 2000
 
 let Lp = (mu0*mur*Math.pow(Np,2)*Ae)/le
-let Ls = (mu0*mur*Math.pow(Ns,2)*Ae)/le
 
-Lp = Lp * 1e6
-Ls = Ls * 1e6
+Lp = Lp*1e6
 
-document.getElementById("inductanceResults").innerHTML =
+let turnsRatio = Ns/Np
+
+let Ls = Lp*Math.pow(turnsRatio,2)
+
+document.getElementById("inductanceResults").innerHTML=
+
 `
-Primary Inductance: ${Lp.toFixed(2)} µH <br>
-Secondary Inductance: ${Ls.toFixed(2)} µH
+Magnetizing Inductance: ${Lp.toFixed(2)} µH<br>
+Reflected Secondary Inductance: ${Ls.toFixed(2)} µH
 `
 
 /* ---------- Core Loss ---------- */
