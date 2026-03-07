@@ -1,32 +1,83 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Transformer Calculator</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
+<head>
+<meta charset="UTF-8">
+<title>High Frequency Transformer Calculator</title>
 
-  <body>
-    <h2>Transformer Calculator</h2>
+<link rel="stylesheet" href="style.css">
 
-    Input Voltage:
-    <input id="vin" /><br /><br />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    Output Voltage:
-    <input id="vout" /><br /><br />
+</head>
 
-    Frequency:
-    <input id="freq" /><br /><br />
+<body>
 
-    Core Area (Ae):
-    <input id="ae" /><br /><br />
+<h1>High Frequency Ferrite Transformer Calculator</h1>
 
-    Flux Density (Bmax):
-    <input id="b" /><br /><br />
+<p>
+This calculator assists in designing ferrite transformers operating from
+10 kHz to several MHz using ferrite core families such as ETD, EE,
+Toroidal, RM and PQ. It calculates the minimum required core area product,
+suggests suitable cores, computes turns, evaluates skin depth and wire
+requirements.
+</p>
 
-    <button onclick="calculate()">Calculate</button>
+<hr>
 
-    <p id="result"></p>
+<h2>Electrical Parameters</h2>
 
-    <script src="script.js"></script>
-  </body>
+Input Voltage (V)
+<input id="vin"><br>
+
+Output Voltage (V)
+<input id="vout"><br>
+
+Frequency (kHz)
+<input id="freq"><br>
+
+Power Rating (VA)
+<input id="power"><br>
+
+
+<h2>Core Selection</h2>
+
+Core Type
+<select id="coretype">
+<option>ETD</option>
+<option>EE</option>
+<option>Toroidal</option>
+<option>RM</option>
+<option>PQ</option>
+</select>
+
+Material
+<select id="material">
+<option>N87</option>
+<option>N97</option>
+<option>PC40</option>
+<option>3C90</option>
+<option>3F3</option>
+</select>
+
+Gap
+<select id="gap">
+<option>Ungapped</option>
+<option>Gapped</option>
+</select>
+
+<br><br>
+
+<button onclick="calculate()">Calculate</button>
+
+<hr>
+
+<h2>Results</h2>
+
+<div id="results"></div>
+
+<br>
+
+<button onclick="generatePDF()">Download PDF</button>
+
+</body>
 </html>
