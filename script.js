@@ -39,8 +39,10 @@ let resultsData={}
 
 function topologyCheck(){
 
-if(topology.value=="Flyback") gap.value="Gapped"
-else gap.value="Ungapped"
+if(topology.value=="Flyback")
+gap.value="Gapped"
+else
+gap.value="Ungapped"
 
 }
 
@@ -57,7 +59,7 @@ let Bmax=materials[material.value].bmax
 
 let Kw=0.5
 let Ku=0.4
-let J=4e6
+let J=4
 
 let Ap=P/(Kw*Ku*Bmax*J*f)
 let Ap_cm4=Ap*1e8
@@ -89,7 +91,10 @@ let skindepth=66/Math.sqrt(freqk*1000)
 calcResults.innerHTML=
 
 `
-Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴<br>
+Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴<br><br>
+Possible Cores:<br>
+${suggestions}
+<br>
 Skin Depth: ${skindepth.toFixed(3)} mm
 `
 
@@ -144,9 +149,7 @@ inductanceResults.innerHTML=
 
 let mat=materials[material.value]
 
-let freqMHz=freqk/1000
-
-let coreLoss=mat.k*Math.pow(freqMHz,mat.a)*Math.pow(Binput,mat.b)
+let coreLoss=mat.k*Math.pow(freqk,mat.a)*Math.pow(Binput,mat.b)
 
 coreLossResults.innerHTML=
 `Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³`
@@ -195,11 +198,11 @@ let Is=P/Vout
 let wireP=parseFloat(primaryWire.value)
 let wireS=parseFloat(secondaryWire.value)
 
-let AwireP=Math.PI*(wireP/2)**2
-let AwireS=Math.PI*(wireS/2)**2
+let AwireP_mm2=Math.PI*(wireP/2)**2
+let AwireS_mm2=Math.PI*(wireS/2)**2
 
-let strandsP=Math.ceil((Ip/4)/AwireP)
-let strandsS=Math.ceil((Is/4)/AwireS)
+let strandsP=Math.ceil((Ip/4)/AwireP_mm2)
+let strandsS=Math.ceil((Is/4)/AwireS_mm2)
 
 strandResult.innerHTML=
 
@@ -208,21 +211,14 @@ Primary Strands: ${strandsP}<br>
 Secondary Strands: ${strandsS}
 `
 
-/* current capability */
+let maxCurrentP=4*AwireP_mm2*strandsP
+let maxCurrentS=4*AwireS_mm2*strandsS
 
-let J=4e6
+let rho=1.72e-8
+let length=0.2*(resultsData.Np+resultsData.Ns)
 
-let maxCurrentP=J*AwireP*strandsP
-let maxCurrentS=J*AwireS*strandsS
-
-/* copper loss */
-
-let Rho=1.72e-8
-
-let length=0.1
-
-let Rp=Rho*length/(AwireP*strandsP)
-let Rs=Rho*length/(AwireS*strandsS)
+let Rp=rho*length/(AwireP_mm2*1e-6*strandsP)
+let Rs=rho*length/(AwireS_mm2*1e-6*strandsS)
 
 let copperLoss=Ip*Ip*Rp + Is*Is*Rs
 
@@ -234,11 +230,11 @@ Max Secondary Current: ${maxCurrentS.toFixed(2)} A<br>
 Estimated Copper Loss: ${copperLoss.toFixed(3)} W
 `
 
-/* window fill check */
-
 let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
 
-let totalCopper=(AwireP*strandsP + AwireS*strandsS)*(resultsData.Np+resultsData.Ns)
+let totalCopper=
+(resultsData.Np*AwireP_mm2*strandsP +
+resultsData.Ns*AwireS_mm2*strandsS)*1e-6
 
 let fill=totalCopper/core.Aw
 
