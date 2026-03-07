@@ -205,9 +205,9 @@ Reflected Secondary Inductance: ${Ls.toFixed(2)} µH
 
 let mat = materials[materialType]
 
-let freqHz = freqk*1000
+let freqHz = freqk/1000
 
-let coreLoss = mat.k*Math.pow(freqHz,mat.a)*Math.pow(Binput,mat.b)
+let coreLoss = k * Math.pow(freqMHz,a) * Math.pow(Binput,b)
 
 document.getElementById("coreLossResults").innerHTML =
 `
