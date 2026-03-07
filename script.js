@@ -143,74 +143,81 @@ Maximum Flux Density: ${materials[mat].bmax} T
 
 function calculateTurns(){
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let freqk=parseFloat(freq.value)
+let Vin = parseFloat(document.getElementById("vin").value)
+let Vout = parseFloat(document.getElementById("vout").value)
+let freqk = parseFloat(document.getElementById("freq").value)
 
-let f=freqk*1000
+let f = freqk * 1000
 
-let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
+let coreType = document.getElementById("coretype").value
+let coreName = document.getElementById("selectedCore").value
 
-let Ae=core.Ae
-let le=core.le
+let core = cores[coreType].find(c => c.name === coreName)
 
-let Binput=parseFloat(Buser.value)
-
-let Bmax=materials[material.value].bmax
-
-if(Binput>Bmax){
-
-alert("Flux density exceeds maximum limit")
+if(!core){
+alert("Please select a core first")
 return
-
 }
 
-let Np=Vin/(4*f*Binput*Ae)
-let Ns=Np*(Vout/Vin)
+let Ae = core.Ae
+let le = core.le
 
-turnResults.innerHTML=
+let Binput = parseFloat(document.getElementById("Buser").value)
 
+let materialType = document.getElementById("material").value
+let Bmax = materials[materialType].bmax
+
+if(Binput > Bmax){
+alert("Flux density exceeds maximum limit")
+return
+}
+
+let Np = Vin/(4*f*Binput*Ae)
+let Ns = Np*(Vout/Vin)
+
+document.getElementById("turnResults").innerHTML =
 `
-Primary Turns: ${Math.round(Np)}<br>
+Primary Turns: ${Math.round(Np)} <br>
 Secondary Turns: ${Math.round(Ns)}
 `
 
-let mu0=4*Math.PI*1e-7
-let mur=2000
+/* ---------- Inductance ---------- */
 
-let Lp=(mu0*mur*Math.pow(Np,2)*Ae)/le
-let Ls=(mu0*mur*Math.pow(Ns,2)*Ae)/le
+let mu0 = 4*Math.PI*1e-7
+let mur = 2000
 
-Lp=Lp*1e6
-Ls=Ls*1e6
+let Lp = (mu0*mur*Math.pow(Np,2)*Ae)/le
+let Ls = (mu0*mur*Math.pow(Ns,2)*Ae)/le
 
-inductanceResults.innerHTML=
+Lp = Lp * 1e6
+Ls = Ls * 1e6
 
+document.getElementById("inductanceResults").innerHTML =
 `
-Primary Inductance: ${Lp.toFixed(2)} µH<br>
+Primary Inductance: ${Lp.toFixed(2)} µH <br>
 Secondary Inductance: ${Ls.toFixed(2)} µH
 `
 
-let mat=materials[material.value]
+/* ---------- Core Loss ---------- */
 
-let freqHz=freqk*1000
+let mat = materials[materialType]
 
-let coreLoss=mat.k*Math.pow(freqHz,mat.a)*Math.pow(Binput,mat.b)
+let freqHz = freqk*1000
 
-coreLossResults.innerHTML=
+let coreLoss = mat.k*Math.pow(freqHz,mat.a)*Math.pow(Binput,mat.b)
 
+document.getElementById("coreLossResults").innerHTML =
 `
 Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³
 `
 
-resultsData.Np=Math.round(Np)
-resultsData.Ns=Math.round(Ns)
-resultsData.Lp=Lp.toFixed(2)
-resultsData.Ls=Ls.toFixed(2)
-resultsData.coreLoss=coreLoss.toFixed(3)
+resultsData.Np = Math.round(Np)
+resultsData.Ns = Math.round(Ns)
+resultsData.Lp = Lp.toFixed(2)
+resultsData.Ls = Ls.toFixed(2)
+resultsData.coreLoss = coreLoss.toFixed(3)
 
 }
-
 function populateWire(){
 
 primaryWire.innerHTML=""
