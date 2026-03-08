@@ -212,16 +212,30 @@ let wireS = parseFloat(secondaryWire.value)
 // Calculate skin depth
 let rho = 1.72e-8
 let mu0 = 4*Math.PI*1e-7
-let f = parseFloat(freq.value) * 1000
+let f = parseFloat(freq.value)*1000
 
 let skin = Math.sqrt(rho/(Math.PI*f*mu0))
 skin *= 1000   // convert to mm
 
-let maxDiameter = 2 * skin
+let maxDiameter = 2*skin
 
-// calculate strands required
-let strandsP = Math.max(1, Math.ceil(wireP / maxDiameter))
-let strandsS = Math.max(1, Math.ceil(wireS / maxDiameter))
+// convert wire diameters to cross-sectional areas
+let areaWireP = Math.PI*(wireP/2)**2
+let areaWireS = Math.PI*(wireS/2)**2
+
+let areaSkin = Math.PI*(maxDiameter/2)**2
+
+// calculate strands needed
+let strandsP = Math.max(1, Math.ceil(areaWireP/areaSkin))
+let strandsS = Math.max(1, Math.ceil(areaWireS/areaSkin))
+// convert to cross-sectional areas
+let areaWireP = Math.PI*(wireP/2)**2
+let areaWireS = Math.PI*(wireS/2)**2
+
+let areaSkin = Math.PI*(maxDiameter/2)**2
+
+let strandsP = Math.max(1, Math.ceil(areaWireP/areaSkin))
+let strandsS = Math.max(1, Math.ceil(areaWireS/areaSkin))
 
 let loss = calculateCopperLoss(
 Ip,
