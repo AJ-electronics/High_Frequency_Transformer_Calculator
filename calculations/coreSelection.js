@@ -1,26 +1,46 @@
-export function calculateCoreSelection(Vin,freq,power,material,coreList){
+export function calculateCoreSelection(Vin, freqk, P, material, coreType)
+{
 
+// convert frequency to Hz
+let f = freqk * 1000
+
+// constants
+let Bmax = 0.2
 let Ku = 0.4
-let J = 4e6
-let Bmax = material.bmax
+let J = 4e6   // current density A/m²
 
-let Ap = power /(Ku*J*Bmax*freq)
+// Area product calculation
+let Ap = (P) / (4 * Bmax * f * Ku * J)
 
-let suitableCores=[]
+// convert m⁴ → cm⁴
+Ap = Ap * 1e8
 
-for(let c of coreList){
 
-if(c.Ap >= Ap*1e8){
+// Skin depth calculation
+let rho = 1.72e-8
+let mu0 = 4 * Math.PI * 1e-7
 
-suitableCores.push(c)
+let skinDepth =
+Math.sqrt((2 * rho) / (2 * Math.PI * f * mu0))
 
-}
+skinDepth = skinDepth * 1000 // mm
 
-}
+
+// find suitable cores
+let coreList = cores[coreType] || []
+
+let possible = coreList.filter(c => c.Ap >= Ap)
+
+let list = possible.map(c => c.name).join("<br>")
+
 
 return {
-areaProduct:Ap*1e8,
-cores:suitableCores
+
+Ap: Ap,
+skinDepth: skinDepth,
+cores: possible,
+list: list
+
 }
 
 }
