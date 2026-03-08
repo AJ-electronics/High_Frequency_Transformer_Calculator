@@ -1,13 +1,61 @@
 body{
 
 font-family:Arial;
-margin:40px;
-background:#f4f4f4;
+margin:0;
+background:url("Pictures/background.png");
+background-size:cover;
+background-attachment:fixed;
 
 }
 
-h1{
-color:#003366;
+.header{
+
+display:flex;
+align-items:center;
+background:#002c45;
+color:white;
+padding:15px;
+
+}
+
+.logo{
+
+height:70px;
+margin-right:20px;
+
+}
+
+.container{
+
+display:flex;
+padding:40px;
+
+}
+
+.left-panel{
+
+width:60%;
+background:white;
+padding:25px;
+border-radius:8px;
+box-shadow:0px 4px 10px rgba(0,0,0,0.2);
+
+}
+
+.right-panel{
+
+width:40%;
+padding-left:40px;
+
+}
+
+.core-preview{
+
+width:260px;
+margin-top:20px;
+border-radius:8px;
+box-shadow:0px 4px 10px rgba(0,0,0,0.3);
+
 }
 
 input,select{
@@ -24,19 +72,12 @@ background:#0077cc;
 color:white;
 border:none;
 cursor:pointer;
+border-radius:4px;
 
 }
 
 button:hover{
 
 background:#005fa3;
-
-}
-
-#calcResults{
-
-background:white;
-padding:20px;
-margin-top:20px;
 
 }

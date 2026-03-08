@@ -1,41 +1,19 @@
-const materials={
-
-"N87":{curie:220,bmax:0.3,k:3.2e-3,a:1.46,b:2.75},
-"N97":{curie:210,bmax:0.32,k:2.5e-3,a:1.45,b:2.7},
-"PC40":{curie:230,bmax:0.35,k:3e-3,a:1.5,b:2.8},
-"3C90":{curie:215,bmax:0.3,k:2.9e-3,a:1.45,b:2.75},
-"3F3":{curie:230,bmax:0.35,k:2.2e-3,a:1.44,b:2.6}
-
-}
-
-const cores={
-
-"ETD":[
-{name:"ETD29",Ap:0.65,Ae:0.00007,le:0.057,Aw:0.0003},
-{name:"ETD39",Ap:2.4,Ae:0.000125,le:0.075,Aw:0.0006},
-{name:"ETD44",Ap:4.5,Ae:0.000173,le:0.087,Aw:0.0009},
-{name:"ETD49",Ap:7.8,Ae:0.000211,le:0.097,Aw:0.0013},
-{name:"ETD59",Ap:17,Ae:0.000368,le:0.115,Aw:0.0025}
-],
-
-"EE":[
-{name:"EE30",Ap:1.1,Ae:0.00009,le:0.060,Aw:0.0004},
-{name:"EE40",Ap:2.6,Ae:0.000125,le:0.085,Aw:0.0007},
-{name:"EE55",Ap:7.5,Ae:0.00025,le:0.120,Aw:0.0016}
-]
-
-}
-
-const awg={
-
-50:0.025,48:0.032,46:0.040,44:0.051,42:0.064,
-40:0.080,38:0.101,36:0.127,34:0.160,32:0.202,
-30:0.255,28:0.321,26:0.405,24:0.511,22:0.644,
-20:0.812,18:1.024,16:1.291,15:1.450
-
-}
-
 let resultsData={}
+
+function updateCoreImage(){
+
+let core=document.getElementById("coretype").value
+let img=document.getElementById("coreImage")
+
+if(core=="ETD") img.src="Pictures/etd.jpg"
+if(core=="EE") img.src="Pictures/ee.jpg"
+if(core=="PQ") img.src="Pictures/pq.jpg"
+if(core=="RM") img.src="Pictures/rm.png"
+if(core=="EP") img.src="Pictures/ep.jpg"
+if(core=="EFD") img.src="Pictures/efd.jpg"
+if(core=="Toroidal") img.src="Pictures/toroidal.jpg"
+
+}
 
 function calculate(){
 
@@ -45,7 +23,6 @@ let freqk=parseFloat(freq.value)
 let P=parseFloat(power.value)
 
 let f=freqk*1000
-
 let Bmax=materials[material.value].bmax
 
 let Ku=0.4
@@ -129,7 +106,6 @@ Np=Math.round(Np)
 Ns=Math.round(Ns)
 
 turnResults.innerHTML=
-
 `Primary Turns: ${Np}<br>Secondary Turns: ${Ns}`
 
 resultsData.Np=Np

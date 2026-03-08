@@ -8,15 +8,27 @@
 
 <link rel="stylesheet" href="style.css">
 
+<script src="data/materials.js"></script>
+<script src="data/cores.js"></script>
+<script src="data/awg.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
 
 <body>
 
+<div class="header">
+
+<img src="Pictures/logo.png" class="logo">
+
 <h1>High Frequency Transformer Calculator</h1>
 
-<hr>
+</div>
+
+<div class="container">
+
+<div class="left-panel">
 
 <h2>Electrical Parameters</h2>
 
@@ -37,9 +49,15 @@ Power Rating (VA)
 <h2>Core Selection</h2>
 
 Core Type
-<select id="coretype">
-<option>ETD</option>
-<option>EE</option>
+
+<select id="coretype" onchange="updateCoreImage()">
+<option value="ETD">ETD</option>
+<option value="EE">EE</option>
+<option value="PQ">PQ</option>
+<option value="RM">RM</option>
+<option value="EP">EP</option>
+<option value="EFD">EFD</option>
+<option value="Toroidal">Toroidal</option>
 </select>
 
 Material
@@ -96,13 +114,26 @@ Secondary Wire
 <h3>Copper Loss</h3>
 <div id="copperLossResults"></div>
 
-
+<h3>Design Checks</h3>
+<div id="designChecks"></div>
 
 <br>
 
 <button id="pdfBtn" onclick="generatePDF()" style="display:none;">
 Download PDF
 </button>
+
+</div>
+
+<div class="right-panel">
+
+<h3>Core Preview</h3>
+
+<img id="coreImage" src="Pictures/etd.jpg" class="core-preview">
+
+</div>
+
+</div>
 
 <script src="script.js"></script>
 
