@@ -1,6 +1,18 @@
+import {calculateCoreSelection} from "./calculations/coreSelection.js"
+import {calculateTurns} from "./calculations/turnsCalculation.js"
+import {calculateInductance} from "./calculations/inductanceCalculation.js"
+import {calculateCoreLoss} from "./calculations/coreLossCalculation.js"
+import {calculateCopperLoss} from "./calculations/copperLossCalculation.js"
+import {calculateWindowFill} from "./calculations/windowFillCalculation.js"
+import {calculateThermal} from "./calculations/thermalCalculation.js"
+
 let resultsData={}
 
-function updateCoreImage(){
+/* -------------------------
+CORE IMAGE UPDATE
+--------------------------*/
+
+window.updateCoreImage=function(){
 
 let core=document.getElementById("coretype").value
 let img=document.getElementById("coreImage")
@@ -11,161 +23,196 @@ if(core=="PQ") img.src="./Pictures/pq.png"
 if(core=="RM") img.src="./Pictures/rm.png"
 if(core=="EP") img.src="./Pictures/ep.png"
 if(core=="EFD") img.src="./Pictures/efd.png"
-if(core=="Toroidal") img.src="./Pictures/torroidal.png"
+if(core=="Toroidal") img.src="./Pictures/toroidal.png"
 
 }
 
-function calculate(){
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let freqk=parseFloat(freq.value)
-let P=parseFloat(power.value)
+/* -------------------------
+MAIN CALCULATE BUTTON
+--------------------------*/
 
-let f=freqk*1000
-let Bmax=materials[material.value].bmax
+window.calculate=function(){
 
-let Ku=0.4
-let J=4e6
+let Vin=parseFloat(document.getElementById("vin").value)
+let Vout=parseFloat(document.getElementById("vout").value)
+let freqk=parseFloat(document.getElementById("freq").value)
+let power=parseFloat(document.getElementById("power").value)
 
-let Ap=P/(Ku*J*Bmax*f)
-let Ap_cm4=Ap*1e8
+let freq=freqk*1000
 
-let corelist=cores[coretype.value]
+let material=materials[document.getElementById("material").value]
 
-selectedCore.innerHTML=""
+let coreType=document.getElementById("coretype").value
+let coreList=cores[coreType]
+
+let coreResult=calculateCoreSelection(Vin,freq,power,material,coreList)
+
+let Ap=coreResult.areaProduct
 
 let suggestions=""
 
-for(let c of corelist){
+let select=document.getElementById("selectedCore")
 
-if(c.Ap>=Ap_cm4){
+select.innerHTML=""
+
+coreResult.cores.forEach(c=>{
+
+let opt=document.createElement("option")
+
+opt.value=c.name
+opt.text=c.name
+
+select.appendChild(opt)
 
 suggestions+=c.name+"<br>"
 
-let opt=document.createElement("option")
-opt.text=c.name
-opt.value=c.name
+})
 
-selectedCore.appendChild(opt)
+let skinDepth=66/Math.sqrt(freq)
 
-}
-
-}
-
-let skindepth=66/Math.sqrt(freqk*1000)
-
-calcResults.innerHTML=
+document.getElementById("calcResults").innerHTML=
 
 `
-Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴<br><br>
+Minimum Area Product: ${Ap.toFixed(2)} cm⁴ <br><br>
+
 Possible Cores:<br>
+
 ${suggestions}
+
 <br>
-Skin Depth: ${skindepth.toFixed(3)} mm
+
+Skin Depth: ${skinDepth.toFixed(3)} mm
+
 `
 
 populateWire()
 
-resultsData={Vin,Vout,freqk,P,Ap_cm4}
+resultsData={Vin,Vout,freqk,power}
 
 }
 
-function showCoreInfo(){
 
-let mat=material.value
+/* -------------------------
+CORE INFORMATION
+--------------------------*/
 
-coreInfo.innerHTML=
+window.showCoreInfo=function(){
+
+let material=materials[document.getElementById("material").value]
+
+document.getElementById("coreInfo").innerHTML=
 
 `
-Curie Temperature: ${materials[mat].curie} °C<br>
-Maximum Flux Density: ${materials[mat].bmax} T
+Curie Temperature: ${material.curie} °C <br>
+Maximum Flux Density: ${material.bmax} T
 `
 
 }
 
-function calculateTurns(){
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let freqk=parseFloat(freq.value)
+/* -------------------------
+TURN CALCULATION
+--------------------------*/
 
-let f=freqk*1000
+window.calculateTurns=function(){
 
-let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
+let Vin=parseFloat(document.getElementById("vin").value)
+let Vout=parseFloat(document.getElementById("vout").value)
+let freqk=parseFloat(document.getElementById("freq").value)
 
-let Ae=core.Ae
-let le=core.le
+let freq=freqk*1000
 
-let Binput=parseFloat(Buser.value)
+let Buser=parseFloat(document.getElementById("Buser").value)
 
-let Np=Vin/(4*f*Binput*Ae)
-let Ns=Np*(Vout/Vin)
+let coreType=document.getElementById("coretype").value
+let coreName=document.getElementById("selectedCore").value
 
-Np=Math.round(Np)
-Ns=Math.round(Ns)
+let core=cores[coreType].find(c=>c.name===coreName)
 
-turnResults.innerHTML=
-`Primary Turns: ${Np}<br>Secondary Turns: ${Ns}`
+let turns=calculateTurns(Vin,Vout,freq,Buser,core.Ae)
 
-resultsData.Np=Np
-resultsData.Ns=Ns
+document.getElementById("turnResults").innerHTML=
 
-let mu0=4*Math.PI*1e-7
-let mur=2000
+`
+Primary Turns: ${turns.Np}<br>
+Secondary Turns: ${turns.Ns}
+`
 
-let Lp=(mu0*mur*Math.pow(Np,2)*Ae)/le
-Lp=Lp*1e6
+resultsData.Np=turns.Np
+resultsData.Ns=turns.Ns
 
-inductanceResults.innerHTML=
-`Magnetizing Inductance: ${Lp.toFixed(2)} µH`
 
-let mat=materials[material.value]
+let L=calculateInductance(turns.Np,core.Ae,core.le)
 
-let coreLoss=
-mat.k*Math.pow(freqk,mat.a)*Math.pow(Binput,mat.b)
+document.getElementById("inductanceResults").innerHTML=
 
-coreLossResults.innerHTML=
-`Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³`
+`Magnetizing Inductance: ${(L*1e6).toFixed(2)} µH`
+
+resultsData.inductance=L
+
+
+let material=materials[document.getElementById("material").value]
+
+let coreLoss=calculateCoreLoss(freqk,Buser,material)
+
+document.getElementById("coreLossResults").innerHTML=
+
+`Core Loss Density: ${coreLoss.toFixed(3)} W/cm³`
+
+resultsData.coreLoss=coreLoss
 
 }
+
+
+/* -------------------------
+WIRE TABLE
+--------------------------*/
 
 function populateWire(){
 
-primaryWire.innerHTML=""
-secondaryWire.innerHTML=""
+let p=document.getElementById("primaryWire")
+let s=document.getElementById("secondaryWire")
+
+p.innerHTML=""
+s.innerHTML=""
 
 for(let g in awg){
 
 let text="AWG "+g+" ("+awg[g]+" mm)"
 
-let opt1=document.createElement("option")
-opt1.text=text
-opt1.value=awg[g]
+let o1=document.createElement("option")
+o1.text=text
+o1.value=awg[g]
 
-primaryWire.appendChild(opt1)
+p.appendChild(o1)
 
-let opt2=document.createElement("option")
-opt2.text=text
-opt2.value=awg[g]
+let o2=document.createElement("option")
+o2.text=text
+o2.value=awg[g]
 
-secondaryWire.appendChild(opt2)
-
-}
+s.appendChild(o2)
 
 }
 
-function calculateStrands(){
+}
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let P=parseFloat(power.value)
 
-let Ip=P/Vin
-let Is=P/Vout
+/* -------------------------
+STRAND + COPPER LOSS
+--------------------------*/
 
-let wireP=parseFloat(primaryWire.value)
-let wireS=parseFloat(secondaryWire.value)
+window.calculateStrands=function(){
+
+let Vin=parseFloat(document.getElementById("vin").value)
+let Vout=parseFloat(document.getElementById("vout").value)
+let power=parseFloat(document.getElementById("power").value)
+
+let Ip=power/Vin
+let Is=power/Vout
+
+let wireP=parseFloat(document.getElementById("primaryWire").value)
+let wireS=parseFloat(document.getElementById("secondaryWire").value)
 
 let AwireP=Math.PI*(wireP/2)**2
 let AwireS=Math.PI*(wireS/2)**2
@@ -173,49 +220,78 @@ let AwireS=Math.PI*(wireS/2)**2
 let strandsP=Math.ceil((Ip/4)/AwireP)
 let strandsS=Math.ceil((Is/4)/AwireS)
 
-strandResult.innerHTML=
+document.getElementById("strandResult").innerHTML=
 
 `
 Primary Strands: ${strandsP}<br>
 Secondary Strands: ${strandsS}
 `
 
-let rho=1.72e-8
-let length=0.2*(resultsData.Np+resultsData.Ns)
+let coreType=document.getElementById("coretype").value
+let coreName=document.getElementById("selectedCore").value
 
-let Rp=rho*length/(AwireP*1e-6*strandsP)
-let Rs=rho*length/(AwireS*1e-6*strandsS)
+let core=cores[coreType].find(c=>c.name===coreName)
 
-let copperLoss=Ip*Ip*Rp + Is*Is*Rs
+let copperLoss=calculateCopperLoss(
 
-copperLossResults.innerHTML=
+Ip,
+Is,
+resultsData.Np,
+resultsData.Ns,
+wireP,
+wireS,
+strandsP,
+strandsS,
+core
 
-`
-Primary Current: ${Ip.toFixed(2)} A<br>
-Secondary Current: ${Is.toFixed(2)} A<br>
-Estimated Copper Loss: ${copperLoss.toFixed(3)} W
-`
+)
 
-let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
-
-let totalCopper=
-(resultsData.Np*AwireP*strandsP +
-resultsData.Ns*AwireS*strandsS)*1e-6
-
-let fill=totalCopper/core.Aw
-
-designChecks.innerHTML=
+document.getElementById("copperLossResults").innerHTML=
 
 `
-Window Fill Factor: ${(fill*100).toFixed(1)} %<br>
+Primary Current: ${Ip.toFixed(2)} A <br>
+Secondary Current: ${Is.toFixed(3)} A <br>
+Copper Loss: ${copperLoss.toFixed(3)} W
+`
+
+let fill=calculateWindowFill(
+
+resultsData.Np,
+resultsData.Ns,
+wireP,
+wireS,
+strandsP,
+strandsS,
+core
+
+)
+
+document.getElementById("designChecks").innerHTML=
+
+`
+Window Fill Factor: ${(fill*100).toFixed(2)} % <br>
 Recommended: < 40 %
 `
 
-pdfBtn.style.display="block"
+let thermal=calculateThermal(resultsData.coreLoss,copperLoss,core)
+
+document.getElementById("thermalResults").innerHTML=
+
+`
+Total Loss: ${thermal.loss.toFixed(2)} W <br>
+Estimated Temperature Rise: ${thermal.temperature.toFixed(1)} °C
+`
+
+document.getElementById("pdfBtn").style.display="block"
 
 }
 
-function generatePDF(){
+
+/* -------------------------
+PDF GENERATION
+--------------------------*/
+
+window.generatePDF=function(){
 
 const {jsPDF}=window.jspdf
 
@@ -228,6 +304,7 @@ let y=40
 for(let k in resultsData){
 
 doc.text(`${k}: ${resultsData[k]}`,20,y)
+
 y+=10
 
 }
