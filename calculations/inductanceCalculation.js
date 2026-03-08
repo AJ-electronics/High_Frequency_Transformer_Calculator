@@ -1,9 +1,13 @@
 export function calculateInductance(Np, core){
 
-let Al = core.Al   // nH/turn²
+let mu0 = 4*Math.PI*1e-7
+let mur = 2000   // ferrite approx
 
-let L = Al * Np * Np / 1000  // µH
+let Ae = core.Ae
+let le = core.le
 
-return L
+let L = mu0 * mur * (Np*Np) * Ae / le
+
+return L*1e6   // µH
 
 }

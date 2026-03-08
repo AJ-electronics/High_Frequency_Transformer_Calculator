@@ -51,7 +51,7 @@ width:40%;
 
 .core-preview-box{
 
-background:#d72828;
+background:#2fbeed;
 border-radius:10px;
 padding:20px;
 text-align:center;
@@ -83,7 +83,7 @@ margin-bottom:10px;
 button{
 
 background:#1b75bb;
-color:white;
+color:rgb(225, 50, 50);
 border:none;
 padding:8px 14px;
 border-radius:5px;

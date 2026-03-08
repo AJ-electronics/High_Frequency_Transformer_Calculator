@@ -199,63 +199,68 @@ window.calculateStrands = function(){
 let core = cores[coretype.value]
 .find(c=>c.name===selectedCore.value)
 
-let copper = calculateCopperLoss({
+let Vin = parseFloat(vin.value)
+let Vout = parseFloat(vout.value)
+let P = parseFloat(power.value)
 
-Vin: parseFloat(vin.value),
-Vout: parseFloat(vout.value),
-P: parseFloat(power.value),
-Np: resultsData.Np,
-Ns: resultsData.Ns,
-wireP: parseFloat(primaryWire.value),
-wireS: parseFloat(secondaryWire.value),
+let Ip = P / Vin
+let Is = P / Vout
+
+let wireP = parseFloat(primaryWire.value)
+let wireS = parseFloat(secondaryWire.value)
+
+let strandsP = 1
+let strandsS = 1
+
+let loss = calculateCopperLoss(
+Ip,
+Is,
+resultsData.Np,
+resultsData.Ns,
+wireP,
+wireS,
+strandsP,
+strandsS,
 core
+)
 
-})
-
-strandResult.innerHTML=
-
+strandResult.innerHTML =
 `
-Primary Strands: ${copper.strandsP}<br>
-Secondary Strands: ${copper.strandsS}
+Primary Strands: ${strandsP}<br>
+Secondary Strands: ${strandsS}
 `
 
-copperLossResults.innerHTML=
-
+copperLossResults.innerHTML =
 `
-Primary Current: ${copper.Ip.toFixed(2)} A<br>
-Secondary Current: ${copper.Is.toFixed(3)} A<br>
-Copper Loss: ${copper.loss.toFixed(3)} W
+Primary Current: ${Ip.toFixed(2)} A<br>
+Secondary Current: ${Is.toFixed(3)} A<br>
+Copper Loss: ${loss.toFixed(3)} W
 `
-
 
 let fill = calculateWindowFill(
 resultsData.Np,
 resultsData.Ns,
-copper.strandsP,
-copper.strandsS,
-parseFloat(primaryWire.value),
-parseFloat(secondaryWire.value),
+wireP,
+wireS,
+strandsP,
+strandsS,
 core
 )
 
-designChecks.innerHTML=
-
+designChecks.innerHTML =
 `
 Window Fill Factor: ${(fill*100).toFixed(2)} %<br>
 Recommended: < 40 %
 `
 
-
-let thermal = calculateThermal(copper.loss, resultsData.coreLoss)
+let thermal = calculateThermal(loss,resultsData.coreLoss,core)
 
 designChecks.innerHTML +=
-
-`<br>Estimated Temperature Rise: ${thermal.toFixed(1)} °C`
+`<br>Estimated Temperature Rise: ${thermal.temperature.toFixed(1)} °C`
 
 pdfBtn.style.display="block"
 
 }
-
 
 // PDF EXPORT
 window.generatePDF = function(){

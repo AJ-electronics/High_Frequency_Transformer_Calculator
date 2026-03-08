@@ -1,10 +1,14 @@
-export function calculateCoreLoss(material, freq, B){
+export function calculateCoreLoss(materialName, freq, B){
 
-let k = material.k
-let a = material.a
-let b = material.b
+let mat = materials[materialName]
 
-let loss = k * Math.pow(f/1000,a) * Math.pow(B,b)
+let k = mat.k
+let a = mat.a
+let b = mat.b
+
+let f = freq * 1000
+
+let loss = k * Math.pow(f,a) * Math.pow(B,b)
 
 return loss
 
