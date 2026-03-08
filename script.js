@@ -1,3 +1,11 @@
+import {calculateCoreSelection} from "./calculations/coreSelection.js"
+import {calculateTurns} from "./calculations/turnsCalculation.js"
+import {calculateInductance} from "./calculations/inductanceCalculation.js"
+import {calculateCoreLoss} from "./calculations/coreLossCalculation.js"
+import {calculateCopperLoss} from "./calculations/copperLossCalculation.js"
+import {calculateWindowFill} from "./calculations/windowFillCalculation.js"
+import {calculateThermal} from "./calculations/thermalCalculation.js"
+
 let resultsData={}
 
 function selectCoreType(type){
