@@ -25,119 +25,44 @@
 <h1>High Frequency Transformer Calculator</h1>
 
 </div>
-<div class="description">
-
-<h2>About This Tool</h2>
-
-<p>
-The High Frequency Transformer Calculator is a design assistant for engineers
-working with ferrite transformers operating in the range of <b>10 kHz to several MHz</b>.
-The tool estimates the required magnetic core size, winding turns, inductance,
-core losses and copper losses based on user supplied electrical parameters.
-</p>
-
-<h3>How to Use the Calculator</h3>
-
-<ol>
-
-<li>
-<b>Enter Electrical Parameters</b><br>
-Provide the following input values:
-<ul>
-<li>Input Voltage (Vin)</li>
-<li>Output Voltage (Vout)</li>
-<li>Switching Frequency in kHz</li>
-<li>Required Power Rating (VA or W)</li>
-</ul>
-These parameters define the basic electrical requirements of the transformer.
-</li>
-
-<li>
-<b>Select Core Family and Material</b><br>
-Choose the desired ferrite core type such as ETD, EE, PQ, RM, EP, EFD or Toroidal.
-Then select the ferrite material (for example N87, N97, PC40 etc).
-</li>
-
-<li>
-<b>Press Calculate</b><br>
-The calculator determines:
-<ul>
-<li>Minimum required Area Product (Ap)</li>
-<li>Possible core sizes that satisfy the power requirement</li>
-<li>Skin depth for the selected frequency</li>
-</ul>
-Select a suitable core from the list of suggested cores.
-</li>
-
-<li>
-<b>Choose Design Flux Density</b><br>
-Enter the desired flux density (typically 0.15 T to 0.25 T for ferrite cores).
-Then press <b>Calculate Turns</b> to compute:
-<ul>
-<li>Primary Turns</li>
-<li>Secondary Turns</li>
-<li>Magnetizing Inductance</li>
-<li>Estimated Core Loss</li>
-</ul>
-</li>
-
-<li>
-<b>Select Wire Gauge</b><br>
-Choose the wire diameter for both primary and secondary windings.
-The calculator determines:
-<ul>
-<li>Number of parallel strands required</li>
-<li>Maximum allowable current</li>
-<li>Estimated copper losses</li>
-<li>Window fill factor of the core</li>
-</ul>
-</li>
-
-<li>
-<b>Download the Design Report</b><br>
-After completing the calculations you can export the results as a PDF report
-containing the design parameters and calculated values.
-</li>
-
-</ol>
-
-</div>
 
 <div class="container">
+
+<!-- LEFT PANEL -->
 
 <div class="left-panel">
 
 <h2>Electrical Parameters</h2>
 
-Input Voltage (V)
-<input id="vin"><br>
+<label>Input Voltage (V)</label>
+<input id="vin">
 
-Output Voltage (V)
-<input id="vout"><br>
+<label>Output Voltage (V)</label>
+<input id="vout">
 
-Frequency (kHz)
-<input id="freq"><br>
+<label>Frequency (kHz)</label>
+<input id="freq">
 
-Power Rating (VA)
-<input id="power"><br>
+<label>Power Rating (VA)</label>
+<input id="power">
 
 <hr>
 
 <h2>Core Selection</h2>
 
-Core Type
+<div class="core-buttons">
 
-<select id="coretype" onchange="updateCoreImage()">
+<button onclick="selectCoreType('ETD')"><img src="./Pictures/etd.png">ETD</button>
+<button onclick="selectCoreType('EE')"><img src="./Pictures/ee.png">EE</button>
+<button onclick="selectCoreType('PQ')"><img src="./Pictures/pq.png">PQ</button>
+<button onclick="selectCoreType('RM')"><img src="./Pictures/rm.png">RM</button>
+<button onclick="selectCoreType('EP')"><img src="./Pictures/ep.png">EP</button>
+<button onclick="selectCoreType('EFD')"><img src="./Pictures/efd.png">EFD</button>
+<button onclick="selectCoreType('Toroidal')"><img src="./Pictures/toroidal.png">Toroidal</button>
 
-<option value="ETD">ETD</option>
-<option value="EE">EE</option>
-<option value="PQ">PQ</option>
-<option value="RM">RM</option>
-<option value="EP">EP</option>
-<option value="EFD">EFD</option>
-<option value="Toroidal">Toroidal</option>
+</div>
 
-</select>
+<input type="hidden" id="coretype" value="ETD">
 
 Material
 
@@ -199,21 +124,24 @@ Secondary Wire
 <h3>Design Checks</h3>
 <div id="designChecks"></div>
 
-<br>
-
 <button id="pdfBtn" onclick="generatePDF()" style="display:none;">
 Download PDF
 </button>
 
 </div>
 
-</div>
+
+<!-- RIGHT PANEL -->
 
 <div class="right-panel">
+
+<div class="core-preview-box">
 
 <h3>Core Preview</h3>
 
 <img id="coreImage" src="./Pictures/etd.png" class="core-preview">
+
+</div>
 
 </div>
 

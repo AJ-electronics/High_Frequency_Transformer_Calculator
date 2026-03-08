@@ -2,27 +2,24 @@ body{
 
 font-family:Arial;
 margin:0;
-background:url("./Pictures/background.png");
+background-image:url("./Pictures/background.png");
 background-size:cover;
-background-attachment:fixed;
-background-color:#dfeff7;
 
 }
 
 .header{
 
+background:#083b4c;
+color:white;
+padding:15px;
 display:flex;
 align-items:center;
-background:white;
-color:#00334d;
-padding:15px;
-border-bottom:3px solid #00334d;
 
 }
 
 .logo{
 
-height:80px;
+width:60px;
 margin-right:20px;
 
 }
@@ -30,84 +27,100 @@ margin-right:20px;
 .container{
 
 display:flex;
-padding:40px;
+gap:40px;
+padding:20px;
 
 }
 
 .left-panel{
 
 width:60%;
-background:#e8f4fb;
-padding:25px;
-border-radius:8px;
-box-shadow:0px 4px 10px rgba(0,0,0,0.2);
+background:#e6f2ff;
+padding:20px;
+border-radius:10px;
 
 }
 
 .right-panel{
 
 width:40%;
-padding-left:40px;
+
+}
+
+.core-preview-box{
+
+background:#e6f2ff;
+padding:20px;
+border-radius:10px;
+text-align:center;
 
 }
 
 .core-preview{
 
-width:260px;
-margin-top:20px;
-border-radius:8px;
-box-shadow:0px 4px 10px rgba(0,0,0,0.3);
+width:220px;
 
 }
 
-input,select{
+input{
 
-padding:6px;
-margin:6px;
+width:150px;
+margin-bottom:10px;
+display:block;
+
+}
+
+select{
+
+margin-bottom:10px;
 
 }
 
 button{
 
-padding:10px;
-background:#0077cc;
+background:#1b75bb;
 color:white;
 border:none;
+padding:8px 14px;
+border-radius:5px;
 cursor:pointer;
-border-radius:4px;
 
 }
 
 button:hover{
 
-background:#005fa3;
-
-}
-.description{
-
-background:#e8f4fb;
-margin:40px;
-padding:25px;
-border-radius:8px;
-box-shadow:0px 4px 10px rgba(0,0,0,0.2);
+background:#155c94;
 
 }
 
-h2{
+.core-buttons{
 
-color:#003b5c;
-border-bottom:2px solid #a7d0e8;
-padding-bottom:5px;
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+margin-bottom:10px;
+
+}
+
+.core-buttons button{
+
+background:#eef6ff;
+color:black;
+border:1px solid #ccc;
+padding:6px;
 
 }
 
-h3{
+.core-buttons img{
 
-color:#004c73;
+width:40px;
+display:block;
+margin:auto;
 
 }
-.description ul{
 
-margin-top:5px;
+hr{
+
+margin:20px 0;
 
 }

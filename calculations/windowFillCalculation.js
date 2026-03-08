@@ -1,13 +1,17 @@
 export function calculateWindowFill(Np,Ns,wireP,wireS,strandsP,strandsS,core){
 
-let AwireP = Math.PI*(wireP/2)**2 *1e-6
-let AwireS = Math.PI*(wireS/2)**2 *1e-6
+let kp = 0.7
+
+let AwireP = Math.PI*(wireP/2)**2 * 1e-6
+let AwireS = Math.PI*(wireS/2)**2 * 1e-6
 
 let copperArea =
-Np*strandsP*AwireP +
-Ns*strandsS*AwireS
+Np * strandsP * AwireP +
+Ns * strandsS * AwireS
 
-let fill = copperArea/core.Aw
+let effectiveWindow = core.Aw * kp
+
+let fill = copperArea / effectiveWindow
 
 return fill
 
