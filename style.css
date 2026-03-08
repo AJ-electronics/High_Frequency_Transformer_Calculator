@@ -5,6 +5,7 @@ margin:0;
 background:url("./Pictures/background.png");
 background-size:cover;
 background-attachment:fixed;
+background-color:#dfeff7;
 
 }
 
@@ -12,15 +13,16 @@ background-attachment:fixed;
 
 display:flex;
 align-items:center;
-background:#002c45;
-color:white;
+background:white;
+color:#00334d;
 padding:15px;
+border-bottom:3px solid #00334d;
 
 }
 
 .logo{
 
-height:70px;
+height:80px;
 margin-right:20px;
 
 }
@@ -35,7 +37,7 @@ padding:40px;
 .left-panel{
 
 width:60%;
-background:white;
+background:#e8f4fb;
 padding:25px;
 border-radius:8px;
 box-shadow:0px 4px 10px rgba(0,0,0,0.2);
@@ -83,21 +85,27 @@ background:#005fa3;
 }
 .description{
 
-background:white;
+background:#e8f4fb;
 margin:40px;
 padding:25px;
 border-radius:8px;
 box-shadow:0px 4px 10px rgba(0,0,0,0.2);
-line-height:1.6;
 
 }
 
-.description h2{
+h2{
 
-color:#003366;
+color:#003b5c;
+border-bottom:2px solid #a7d0e8;
+padding-bottom:5px;
 
 }
 
+h3{
+
+color:#004c73;
+
+}
 .description ul{
 
 margin-top:5px;
