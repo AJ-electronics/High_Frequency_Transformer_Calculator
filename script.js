@@ -8,6 +8,35 @@ import {calculateThermal} from "./calculations/thermalCalculation.js"
 
 let resultsData = {}
 
+// DOM elements
+const vin = document.getElementById("vin")
+const vout = document.getElementById("vout")
+const freq = document.getElementById("freq")
+const power = document.getElementById("power")
+
+const coretype = document.getElementById("coretype")
+const material = document.getElementById("material")
+
+const calcResults = document.getElementById("calcResults")
+const selectedCore = document.getElementById("selectedCore")
+const coreInfo = document.getElementById("coreInfo")
+
+const Buser = document.getElementById("Buser")
+
+const turnResults = document.getElementById("turnResults")
+const inductanceResults = document.getElementById("inductanceResults")
+const coreLossResults = document.getElementById("coreLossResults")
+
+const primaryWire = document.getElementById("primaryWire")
+const secondaryWire = document.getElementById("secondaryWire")
+
+const strandResult = document.getElementById("strandResult")
+const copperLossResults = document.getElementById("copperLossResults")
+
+const designChecks = document.getElementById("designChecks")
+const pdfBtn = document.getElementById("pdfBtn")
+
+const coreImage = document.getElementById("coreImage")
 
 // CORE CARD CLICK HANDLER
 document.querySelectorAll(".core-btn").forEach(button => {
@@ -16,10 +45,9 @@ button.addEventListener("click", () => {
 
 let core = button.dataset.core
 
-document.getElementById("coretype").value = core
+coretype.value = core
 
-document.getElementById("coreImage").src =
-"./Pictures/" + core.toLowerCase() + ".png"
+coreImage.src = "./Pictures/" + core.toLowerCase() + ".png"
 
 document.querySelectorAll(".core-btn").forEach(b=>{
 b.classList.remove("selected-core")
@@ -43,8 +71,8 @@ let result = calculateCoreSelection(
 Vin,
 freqk,
 P,
-document.getElementById("material").value,
-document.getElementById("coretype").value
+material.value,
+coretype.value
 )
 
 selectedCore.innerHTML = ""
@@ -156,7 +184,7 @@ secondaryWire.appendChild(opt.cloneNode(true))
 // STRANDS + COPPER LOSS + WINDOW FILL
 window.calculateStrands = function(){
 
-let core = cores[document.getElementById("coretype").value]
+let core = cores[coretype.value]
 .find(c=>c.name===selectedCore.value)
 
 let copper = calculateCopperLoss({
