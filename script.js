@@ -87,12 +87,14 @@ selectedCore.appendChild(opt)
 
 })
 
-calcResults.innerHTML =
+let Ap = result.Ap ? result.Ap.toFixed(2) : "N/A"
+let skin = result.skinDepth ? result.skinDepth.toFixed(3) : "N/A"
 
+calcResults.innerHTML =
 `
-Minimum Area Product: ${result.Ap.toFixed(2)} cm⁴<br>
-Possible Cores:<br>${result.list}<br>
-Skin Depth: ${result.skinDepth.toFixed(3)} mm
+Minimum Area Product: ${Ap} cm⁴<br>
+Possible Cores:<br>${result.list || "None"}<br>
+Skin Depth: ${skin} mm
 `
 
 populateWire()
