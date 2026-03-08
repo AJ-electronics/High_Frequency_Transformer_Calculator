@@ -1,40 +1,32 @@
-import { calculateCoreSelection } from "./calculations/coreSelection.js"
-import { calculateTurns } from "./calculations/turnsCalculation.js"
-import { calculateInductance } from "./calculations/inductanceCalculation.js"
-import { calculateCoreLoss } from "./calculations/coreLossCalculation.js"
-import { calculateCopperLoss } from "./calculations/copperLossCalculation.js"
-import { calculateWindowFill } from "./calculations/windowFillCalculation.js"
-import { calculateThermal } from "./calculations/thermalCalculation.js"
-
 let resultsData={}
 
 function selectCoreType(type){
 
-document.getElementById("coretype").value=type
+document.getElementById("coretype").value = type
 
-let img=document.getElementById("coreImage")
-
-img.src="./Pictures/"+type.toLowerCase()+".png"
+document.getElementById("coreImage").src =
+"./Pictures/" + type.toLowerCase() + ".png"
 
 }
+
 
 function calculate(){
 
 let Vin=parseFloat(vin.value)
 let freqk=parseFloat(freq.value)
-let power=parseFloat(power.value)
+let P=parseFloat(power.value)
 
 let freq=freqk*1000
 
-let material=materials[material.value]
+let mat=materials[material.value]
 
 let coreList=cores[coretype.value]
 
 let Ku=0.4
 let J=4e6
-let Bmax=material.bmax
+let Bmax=mat.bmax
 
-let Ap=power/(Ku*J*Bmax*freq)
+let Ap=P/(Ku*J*Bmax*freq)
 
 let Ap_cm4=Ap*1e8
 
@@ -47,7 +39,6 @@ coreList.forEach(c=>{
 if(c.Ap>=Ap_cm4){
 
 let opt=document.createElement("option")
-
 opt.text=c.name
 opt.value=c.name
 
@@ -73,6 +64,7 @@ populateWire()
 
 }
 
+
 function showCoreInfo(){
 
 let mat=materials[material.value]
@@ -86,11 +78,13 @@ Maximum Flux Density: ${mat.bmax} T
 
 }
 
+
 function calculateTurns(){
 
 let Vin=parseFloat(vin.value)
 let Vout=parseFloat(vout.value)
 let freqk=parseFloat(freq.value)
+
 let B=parseFloat(Buser.value)
 
 let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
@@ -100,13 +94,13 @@ let freq=freqk*1000
 let Np=Vin/(4*freq*B*core.Ae)
 let Ns=Np*(Vout/Vin)
 
-turnResults.innerHTML=
-
-`Primary Turns: ${Math.round(Np)}<br>
-Secondary Turns: ${Math.round(Ns)}`
-
 resultsData.Np=Math.round(Np)
 resultsData.Ns=Math.round(Ns)
+
+turnResults.innerHTML=
+
+`Primary Turns: ${resultsData.Np}<br>
+Secondary Turns: ${resultsData.Ns}`
 
 let mu0=4*Math.PI*1e-7
 let mur=2000
@@ -129,6 +123,7 @@ resultsData.coreLoss=coreLoss
 
 }
 
+
 function populateWire(){
 
 primaryWire.innerHTML=""
@@ -144,21 +139,21 @@ opt.text=text
 opt.value=awg[g]
 
 primaryWire.appendChild(opt)
-
 secondaryWire.appendChild(opt.cloneNode(true))
 
 }
 
 }
 
+
 function calculateStrands(){
 
 let Vin=parseFloat(vin.value)
 let Vout=parseFloat(vout.value)
-let power=parseFloat(power.value)
+let P=parseFloat(power.value)
 
-let Ip=power/Vin
-let Is=power/Vout
+let Ip=P/Vin
+let Is=P/Vout
 
 let wireP=parseFloat(primaryWire.value)
 let wireS=parseFloat(secondaryWire.value)
@@ -202,7 +197,6 @@ Copper Loss: ${copperLoss.toFixed(3)} W
 let kp=0.7
 
 let copperArea=
-
 resultsData.Np*strandsP*AwirePm2+
 resultsData.Ns*strandsS*AwireSm2
 
@@ -219,17 +213,14 @@ pdfBtn.style.display="block"
 
 }
 
+
 function generatePDF(){
 
 const {jsPDF}=window.jspdf
 
 let doc=new jsPDF()
 
-doc.text("High Frequency Transformer Design",20,20)
-
-let text=document.body.innerText
-
-doc.text(text,20,40)
+doc.text("Transformer Design Report",20,20)
 
 doc.save("transformer_design.pdf")
 
