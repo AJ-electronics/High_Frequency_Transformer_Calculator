@@ -142,7 +142,6 @@ let Lp=(mu0*mur*Math.pow(Np,2)*Ae)/le
 Lp=Lp*1e6
 
 inductanceResults.innerHTML=
-
 `Magnetizing Inductance: ${Lp.toFixed(2)} µH`
 
 let mat=materials[material.value]
@@ -151,7 +150,6 @@ let coreLoss=
 mat.k*Math.pow(freqk,mat.a)*Math.pow(Binput,mat.b)
 
 coreLossResults.innerHTML=
-
 `Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³`
 
 resultsData.coreLoss=coreLoss
@@ -206,6 +204,37 @@ strandResult.innerHTML=
 `
 Primary Strands: ${strandsP}<br>
 Secondary Strands: ${strandsS}
+`
+
+let rho=1.72e-8
+let length=0.2*(resultsData.Np+resultsData.Ns)
+
+let Rp=rho*length/(AwireP*1e-6*strandsP)
+let Rs=rho*length/(AwireS*1e-6*strandsS)
+
+let copperLoss=Ip*Ip*Rp + Is*Is*Rs
+
+copperLossResults.innerHTML=
+
+`
+Primary Current: ${Ip.toFixed(2)} A<br>
+Secondary Current: ${Is.toFixed(2)} A<br>
+Estimated Copper Loss: ${copperLoss.toFixed(3)} W
+`
+
+let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
+
+let totalCopper=
+(resultsData.Np*AwireP*strandsP +
+resultsData.Ns*AwireS*strandsS)*1e-6
+
+let fill=totalCopper/core.Aw
+
+designChecks.innerHTML=
+
+`
+Window Fill Factor: ${(fill*100).toFixed(1)} %<br>
+Recommended: < 40 %
 `
 
 pdfBtn.style.display="block"
