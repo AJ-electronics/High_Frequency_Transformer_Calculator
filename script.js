@@ -1,299 +1,158 @@
-const materials={
+const materials = {
+    "N87": { curie: 220, bmax: 0.3, k: 3.2e-3, a: 1.46, b: 2.75 },
+    "N97": { curie: 210, bmax: 0.32, k: 2.5e-3, a: 1.45, b: 2.7 },
+    "PC40": { curie: 230, bmax: 0.35, k: 3e-3, a: 1.5, b: 2.8 },
+    "3C90": { curie: 215, bmax: 0.3, k: 2.9e-3, a: 1.45, b: 2.75 },
+    "3F3": { curie: 230, bmax: 0.35, k: 2.2e-3, a: 1.44, b: 2.6 }
+};
 
-"N87":{curie:220,bmax:0.3,k:3.2e-3,a:1.46,b:2.75},
-"N97":{curie:210,bmax:0.32,k:2.5e-3,a:1.45,b:2.7},
-"PC40":{curie:230,bmax:0.35,k:3e-3,a:1.5,b:2.8},
-"3C90":{curie:215,bmax:0.3,k:2.9e-3,a:1.45,b:2.75},
-"3F3":{curie:230,bmax:0.35,k:2.2e-3,a:1.44,b:2.6}
+const cores = {
+    "ETD": [
+        { name: "ETD29", Ap: 0.65, Ae: 70, le: 70.4, Aw: 92 }, // Ae in mm2, le in mm
+        { name: "ETD39", Ap: 2.4, Ae: 125, le: 92.2, Aw: 174 },
+        { name: "ETD44", Ap: 4.5, Ae: 173, le: 103, Aw: 213 },
+        { name: "ETD49", Ap: 7.8, Ae: 211, le: 114, Aw: 273 },
+        { name: "ETD59", Ap: 17, Ae: 368, le: 139, Aw: 365 }
+    ],
+    "EE": [
+        { name: "EE30", Ap: 1.1, Ae: 110, le: 67, Aw: 80 },
+        { name: "EE40", Ap: 2.6, Ae: 127, le: 77, Aw: 110 },
+        { name: "EE55", Ap: 7.5, Ae: 354, le: 123, Aw: 250 }
+    ]
+};
 
+const awg = {
+    40: 0.080, 38: 0.101, 36: 0.127, 34: 0.160, 32: 0.202,
+    30: 0.255, 28: 0.321, 26: 0.405, 24: 0.511, 22: 0.644,
+    20: 0.812, 18: 1.024, 16: 1.291
+};
+
+let resultsData = {};
+
+function calculate() {
+    let Vin = parseFloat(document.getElementById("vin").value);
+    let freqk = parseFloat(document.getElementById("freq").value);
+    let P = parseFloat(document.getElementById("power").value);
+    let f = freqk * 1000;
+    let Bmax = materials[document.getElementById("material").value].bmax;
+
+    // Area Product Formula: Ap = (Pt * 10^4) / (4 * f * Bmax * J * Ku)
+    let J = 400; // Current density A/cm2
+    let Ku = 0.4; // Window utilization
+    let Ap_cm4 = (P) / (4 * f * Bmax * J * Ku * 1e-4);
+
+    let corelist = cores[document.getElementById("coretype").value];
+    let selectDropdown = document.getElementById("selectedCore");
+    selectDropdown.innerHTML = "";
+    
+    let suggestions = "";
+    corelist.forEach(c => {
+        if (c.Ap >= Ap_cm4) {
+            suggestions += `<li>${c.name}</li>`;
+            let opt = document.createElement("option");
+            opt.text = c.name;
+            opt.value = c.name;
+            selectDropdown.appendChild(opt);
+        }
+    });
+
+    let skindepth = 66 / Math.sqrt(f); // mm
+
+    document.getElementById("calcResults").innerHTML = `
+        <strong>Minimum Area Product Required:</strong> ${Ap_cm4.toFixed(3)} cm⁴<br>
+        <strong>Recommended Cores:</strong> <ul>${suggestions || "No cores large enough"}</ul>
+        <strong>Skin Depth at ${freqk}kHz:</strong> ${skindepth.toFixed(3)} mm
+    `;
+
+    populateWire();
+    resultsData = { Vin, freqk, P, Ap_cm4, skindepth };
 }
 
-const cores={
+function calculateTurns() {
+    let Vin = parseFloat(document.getElementById("vin").value);
+    let Vout = parseFloat(document.getElementById("vout").value);
+    let f = parseFloat(document.getElementById("freq").value) * 1000;
+    let Binput = parseFloat(document.getElementById("Buser").value);
+    
+    let selectedCoreName = document.getElementById("selectedCore").value;
+    let core = cores[document.getElementById("coretype").value].find(c => c.name === selectedCoreName);
+    
+    // Faraday's Law: N = V / (4 * f * B * Ae)
+    // Ae is in mm2, need to convert to m2 (* 1e-6)
+    let Ae_m2 = core.Ae * 1e-6;
+    let Np = Math.ceil(Vin / (4 * f * Binput * Ae_m2));
+    let Ns = Math.ceil(Np * (Vout / Vin));
 
-"ETD":[
-{name:"ETD29",Ap:0.65,Ae:0.00007,le:0.057,Aw:0.0003},
-{name:"ETD39",Ap:2.4,Ae:0.000125,le:0.075,Aw:0.0006},
-{name:"ETD44",Ap:4.5,Ae:0.000173,le:0.087,Aw:0.0009},
-{name:"ETD49",Ap:7.8,Ae:0.000211,le:0.097,Aw:0.0013},
-{name:"ETD59",Ap:17,Ae:0.000368,le:0.115,Aw:0.0025}
-],
+    document.getElementById("turnResults").innerHTML = `
+        <strong>Primary Turns:</strong> ${Np}<br>
+        <strong>Secondary Turns:</strong> ${Ns}
+    `;
 
-"EE":[
-{name:"EE30",Ap:1.1,Ae:0.00009,le:0.060,Aw:0.0004},
-{name:"EE40",Ap:2.6,Ae:0.000125,le:0.085,Aw:0.0007},
-{name:"EE55",Ap:7.5,Ae:0.00025,le:0.120,Aw:0.0016}
-]
+    // Core Loss Calculation (Steinmetz)
+    let mat = materials[document.getElementById("material").value];
+    let coreLoss = mat.k * Math.pow((f/1000), mat.a) * Math.pow(Binput, mat.b);
+    document.getElementById("coreLossResults").innerHTML = `Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³`;
 
+    Object.assign(resultsData, { Np, Ns, Binput, coreLoss });
 }
 
-const awg={
+function populateWire() {
+    const pSel = document.getElementById("primaryWire");
+    const sSel = document.getElementById("secondaryWire");
+    pSel.innerHTML = ""; sSel.innerHTML = "";
 
-50:0.025,48:0.032,46:0.040,44:0.051,42:0.064,
-40:0.080,38:0.101,36:0.127,34:0.160,32:0.202,
-30:0.255,28:0.321,26:0.405,24:0.511,22:0.644,
-20:0.812,18:1.024,16:1.291,15:1.450
-
+    for (let g in awg) {
+        let opt = `<option value="${awg[g]}">AWG ${g} (${awg[g]}mm)</option>`;
+        pSel.innerHTML += opt;
+        sSel.innerHTML += opt;
+    }
 }
 
-let resultsData={}
+function calculateStrands() {
+    let Ip = resultsData.P / resultsData.Vin;
+    let Is = resultsData.P / parseFloat(document.getElementById("vout").value);
+    
+    let dP = parseFloat(document.getElementById("primaryWire").value);
+    let dS = parseFloat(document.getElementById("secondaryWire").value);
 
-function calculate(){
+    // Current density limit ~4A/mm2
+    let areaP = Math.PI * Math.pow(dP / 2, 2);
+    let areaS = Math.PI * Math.pow(dS / 2, 2);
 
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let freqk=parseFloat(freq.value)
-let P=parseFloat(power.value)
+    let strandsP = Math.ceil((Ip / 4) / areaP);
+    let strandsS = Math.ceil((Is / 4) / areaS);
 
-let f=freqk*1000
-
-let Bmax=materials[material.value].bmax
-
-let Ku=0.4
-let J=4e6
-
-let Ap=P/(Ku*J*Bmax*f)
-let Ap_cm4=Ap*1e8
-
-let corelist=cores[coretype.value]
-
-selectedCore.innerHTML=""
-
-let suggestions=""
-
-for(let c of corelist){
-
-if(c.Ap>=Ap_cm4){
-
-suggestions+=c.name+"<br>"
-
-let opt=document.createElement("option")
-opt.text=c.name
-opt.value=c.name
-
-selectedCore.appendChild(opt)
-
+    document.getElementById("strandResult").innerHTML = `
+        <strong>Primary:</strong> ${strandsP} parallel strands<br>
+        <strong>Secondary:</strong> ${strandsS} parallel strands
+    `;
+    
+    document.getElementById("pdfBtn").style.display = "block";
 }
 
-}
-
-let skindepth=66/Math.sqrt(freqk*1000)
-
-calcResults.innerHTML=
-
-`
-Minimum Area Product: ${Ap_cm4.toFixed(2)} cm⁴<br><br>
-Possible Cores:<br>
-${suggestions}
-<br>
-Skin Depth: ${skindepth.toFixed(3)} mm
-`
-
-populateWire()
-
-resultsData={Vin,Vout,freqk,P,Ap_cm4}
-
-}
-
-function showCoreInfo(){
-
-let mat=material.value
-
-coreInfo.innerHTML=
-
-`
-Curie Temperature: ${materials[mat].curie} °C<br>
-Maximum Flux Density: ${materials[mat].bmax} T
-`
-
-}
-
-function calculateTurns(){
-
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let freqk=parseFloat(freq.value)
-
-let f=freqk*1000
-
-let core=cores[coretype.value].find(c=>c.name===selectedCore.value)
-
-let Ae=core.Ae
-let le=core.le
-
-let Binput=parseFloat(Buser.value)
-
-let Np=Vin/(4*f*Binput*Ae)
-let Ns=Np*(Vout/Vin)
-
-Np=Math.round(Np)
-Ns=Math.round(Ns)
-
-turnResults.innerHTML=
-
-`Primary Turns: ${Np}<br>Secondary Turns: ${Ns}`
-
-resultsData.Np=Np
-resultsData.Ns=Ns
-
-let mu0=4*Math.PI*1e-7
-let mur=2000
-
-let Lp=(mu0*mur*Math.pow(Np,2)*Ae)/le
-Lp=Lp*1e6
-
-inductanceResults.innerHTML=
-
-`Magnetizing Inductance: ${Lp.toFixed(2)} µH`
-
-let mat=materials[material.value]
-
-let coreLoss=
-mat.k*Math.pow(freqk,mat.a)*Math.pow(Binput,mat.b)
-
-coreLossResults.innerHTML=
-
-`Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³`
-
-resultsData.coreLoss=coreLoss
-
-}
-
-function populateWire(){
-
-primaryWire.innerHTML=""
-secondaryWire.innerHTML=""
-
-for(let g in awg){
-
-let text="AWG "+g+" ("+awg[g]+" mm)"
-
-let opt1=document.createElement("option")
-opt1.text=text
-opt1.value=awg[g]
-
-primaryWire.appendChild(opt1)
-
-let opt2=document.createElement("option")
-opt2.text=text
-opt2.value=awg[g]
-
-secondaryWire.appendChild(opt2)
-
-}
-
-}
-
-function calculateStrands(){
-
-let Vin=parseFloat(vin.value)
-let Vout=parseFloat(vout.value)
-let P=parseFloat(power.value)
-
-let Ip=P/Vin
-let Is=P/Vout
-
-let wireP=parseFloat(primaryWire.value)
-let wireS=parseFloat(secondaryWire.value)
-
-let AwireP=Math.PI*(wireP/2)**2
-let AwireS=Math.PI*(wireS/2)**2
-
-let strandsP=Math.ceil((Ip/4)/AwireP)
-let strandsS=Math.ceil((Is/4)/AwireS)
-
-strandResult.innerHTML=
-
-`
-Primary Strands: ${strandsP}<br>
-Secondary Strands: ${strandsS}
-`
-
-pdfBtn.style.display="block"
-
-}
-
-async function askAI(){
-
-document.getElementById("aiResults").innerText="Analyzing design..."
-
-let designData={
-
-Vin:vin.value,
-Vout:vout.value,
-Frequency_kHz:freq.value,
-Power_W:power.value,
-Core:selectedCore.value,
-Material:material.value,
-FluxDensity_T:Buser.value,
-PrimaryTurns:resultsData.Np,
-SecondaryTurns:resultsData.Ns
-
-}
-
-try{
-
-let response=await fetch(
-"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyA-etvwwztpw15UUqOc4C5P-RmY9K-uqk0",
-{
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-contents:[{
-parts:[{
-text:
-`You are an expert SMPS transformer designer.
-
-Analyze the following transformer design and suggest improvements.
-
-Design Data:
-${JSON.stringify(designData,null,2)}
-
-Check core selection, flux density, and efficiency.`
-}]
-}]
-
-})
-
-})
-
-let data=await response.json()
-
-let output=data?.candidates?.[0]?.content?.parts?.[0]?.text || "No AI response."
-
-document.getElementById("aiResults").innerText=output
-
-}
-
-catch(e){
-
-document.getElementById("aiResults").innerText="AI request failed."
-
-}
-
-}
-
-function generatePDF(){
-
-const {jsPDF}=window.jspdf
-
-let doc=new jsPDF()
-
-doc.text("Transformer Design Report",20,20)
-
-let y=40
-
-for(let k in resultsData){
-
-doc.text(`${k}: ${resultsData[k]}`,20,y)
-y+=10
-
-}
-
-doc.save("transformer_design.pdf")
-
+async function askAI() {
+    const resultsDiv = document.getElementById("aiResults");
+    resultsDiv.innerText = "Consulting the Oracle...";
+
+    // Security check: Don't hardcode keys!
+    let apiKey = prompt("Please enter your Gemini API Key:");
+    if(!apiKey) { resultsDiv.innerText = "API Key required."; return; }
+
+    let promptText = `Analyze this HF Transformer design:
+    Power: ${resultsData.P}W, Freq: ${resultsData.freqk}kHz, 
+    Core: ${document.getElementById("selectedCore").value},
+    Primary Turns: ${resultsData.Np}, Flux Density: ${resultsData.Binput}T.
+    Is there a risk of saturation or excessive skin effect?`;
+
+    try {
+        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+        });
+        let data = await response.json();
+        resultsDiv.innerText = data.candidates[0].content.parts[0].text;
+    } catch (e) {
+        resultsDiv.innerText = "Error connecting to AI.";
+    }
 }

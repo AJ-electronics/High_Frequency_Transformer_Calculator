@@ -1,119 +1,60 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-<meta charset="UTF-8">
-<title>High Frequency Transformer Calculator</title>
-
-<link rel="stylesheet" href="style.css">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HF Transformer Designer Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
-
 <body>
+    <div class="container">
+        <h1>HF Transformer Designer</h1>
+        
+        <section class="card">
+            <h2>1. Specifications</h2>
+            <div class="grid">
+                <label>Input Voltage (V) <input type="number" id="vin" value="12"></label>
+                <label>Output Voltage (V) <input type="number" id="vout" value="310"></label>
+                <label>Frequency (kHz) <input type="number" id="freq" value="50"></label>
+                <label>Power (W) <input type="number" id="power" value="100"></label>
+            </div>
+        </section>
 
-<h1>High Frequency Transformer Calculator</h1>
+        <section class="card">
+            <h2>2. Core & Material</h2>
+            <select id="coretype"><option>ETD</option><option>EE</option></select>
+            <select id="material">
+                <option>N87</option><option>N97</option><option>PC40</option>
+            </select>
+            <button onclick="calculate()">Find Suitable Cores</button>
+            <div id="calcResults" class="results"></div>
+        </section>
 
-<hr>
+        <section class="card">
+            <h2>3. Winding Design</h2>
+            <label>Select Core: <select id="selectedCore" onchange="showCoreInfo()"></select></label>
+            <label>Design Flux (Bmax): <input id="Buser" type="number" step="0.01" value="0.15"></label>
+            <button onclick="calculateTurns()">Calculate Turns</button>
+            <div id="turnResults" class="results"></div>
+            <div id="coreLossResults"></div>
+        </section>
 
-<h2>Electrical Parameters</h2>
+        <section class="card">
+            <h2>4. Wire Geometry</h2>
+            <label>Primary AWG: <select id="primaryWire"></select></label>
+            <label>Secondary AWG: <select id="secondaryWire"></select></label>
+            <button onclick="calculateStrands()">Calculate Stranding</button>
+            <div id="strandResult" class="results"></div>
+        </section>
 
-Input Voltage (V)
-<input id="vin"><br>
+        <section class="ai-section">
+            <button class="ai-btn" onclick="askAI()">🚀 AI Design Review</button>
+            <div id="aiResults"></div>
+        </section>
 
-Output Voltage (V)
-<input id="vout"><br>
-
-Frequency (kHz)
-<input id="freq"><br>
-
-Power Rating (VA)
-<input id="power"><br>
-
-<hr>
-
-<h2>Core Selection</h2>
-
-Core Type
-<select id="coretype">
-<option>ETD</option>
-<option>EE</option>
-</select>
-
-Material
-<select id="material">
-<option>N87</option>
-<option>N97</option>
-<option>PC40</option>
-<option>3C90</option>
-<option>3F3</option>
-</select>
-
-<button onclick="calculate()">Calculate</button>
-
-<div id="calcResults"></div>
-
-<hr>
-
-<h3>Select Core</h3>
-
-<select id="selectedCore" onchange="showCoreInfo()"></select>
-
-<div id="coreInfo"></div>
-
-<hr>
-
-<h3>Design Flux Density</h3>
-
-<input id="Buser" value="0.2">
-
-<button onclick="calculateTurns()">Calculate Turns</button>
-
-<div id="turnResults"></div>
-
-<h3>Inductance</h3>
-<div id="inductanceResults"></div>
-
-<h3>Core Loss</h3>
-<div id="coreLossResults"></div>
-
-<hr>
-
-<h3>Wire Selection</h3>
-
-Primary Wire
-<select id="primaryWire"></select>
-
-Secondary Wire
-<select id="secondaryWire"></select>
-
-<button onclick="calculateStrands()">Calculate Strands</button>
-
-<div id="strandResult"></div>
-
-<h3>Copper Loss</h3>
-<div id="copperLossResults"></div>
-
-<h3>Design Checks</h3>
-<div id="designChecks"></div>
-
-<hr>
-
-<h3>AI Transformer Design Assistant</h3>
-
-<button onclick="askAI()">Analyze Design</button>
-
-<div id="aiResults"></div>
-
-<br>
-
-<button id="pdfBtn" onclick="generatePDF()" style="display:none;">
-Download PDF
-</button>
-
-<script src="script.js"></script>
-
+        <button id="pdfBtn" style="display:none;" onclick="generatePDF()">Download Design Report</button>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
