@@ -8,12 +8,22 @@ import {calculateThermal} from "./calculations/thermalCalculation.js"
 
 let resultsData={}
 
-function selectCoreType(type){
+function selectCoreType(button,type){
 
+// update hidden value used by calculations
 document.getElementById("coretype").value = type
 
+// update preview image
 document.getElementById("coreImage").src =
 "./Pictures/" + type.toLowerCase() + ".png"
+
+// remove previous selection
+document.querySelectorAll(".core-btn").forEach(b=>{
+b.classList.remove("selected-core")
+})
+
+// highlight selected button
+button.classList.add("selected-core")
 
 }
 
