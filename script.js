@@ -209,8 +209,19 @@ let Is = P / Vout
 let wireP = parseFloat(primaryWire.value)
 let wireS = parseFloat(secondaryWire.value)
 
-let strandsP = 1
-let strandsS = 1
+// Calculate skin depth
+let rho = 1.72e-8
+let mu0 = 4*Math.PI*1e-7
+let f = parseFloat(freq.value) * 1000
+
+let skin = Math.sqrt(rho/(Math.PI*f*mu0))
+skin *= 1000   // convert to mm
+
+let maxDiameter = 2 * skin
+
+// calculate strands required
+let strandsP = Math.max(1, Math.ceil(wireP / maxDiameter))
+let strandsS = Math.max(1, Math.ceil(wireS / maxDiameter))
 
 let loss = calculateCopperLoss(
 Ip,
@@ -240,8 +251,8 @@ Copper Loss: ${loss.toFixed(3)} W
 let fill = calculateWindowFill(
 resultsData.Np,
 resultsData.Ns,
-wireP,
-wireS,
+parseFloat(primaryWire.value),
+parseFloat(secondaryWire.value),
 strandsP,
 strandsS,
 core
