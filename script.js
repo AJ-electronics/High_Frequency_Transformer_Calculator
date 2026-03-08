@@ -8,6 +8,27 @@ import {calculateThermal} from "./calculations/thermalCalculation.js"
 
 let resultsData={}
 
+document.querySelectorAll(".core-btn").forEach(button=>{
+
+button.addEventListener("click",()=>{
+
+let core=button.dataset.core
+
+document.getElementById("coretype").value=core
+
+document.getElementById("coreImage").src=
+"./Pictures/"+core.toLowerCase()+".png"
+
+document.querySelectorAll(".core-btn").forEach(b=>{
+b.classList.remove("selected-core")
+})
+
+button.classList.add("selected-core")
+
+})
+
+})
+
 function selectCoreType(button,type){
 
 // update hidden value used by calculations
