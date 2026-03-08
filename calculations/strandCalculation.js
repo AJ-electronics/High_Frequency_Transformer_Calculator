@@ -1,31 +1,29 @@
-export function calculateStrands(wireDiameter, frequency){
+export function calculateStrands(current, frequency){
 
-// copper constants
 const rho = 1.72e-8
-const mu0 = 4 * Math.PI * 1e-7
+const mu0 = 4*Math.PI*1e-7
 
-// convert frequency to Hz
 let f = frequency * 1000
 
-// skin depth (meters)
-let skin = Math.sqrt(rho/(Math.PI * f * mu0))
+// skin depth
+let skin = Math.sqrt(rho/(Math.PI*f*mu0))
+skin *= 1000 // mm
 
-// convert to mm
-skin *= 1000
+// choose strand diameter ~ skin depth
+let strandDiameter = skin
 
-// maximum usable strand diameter
-let maxDiameter = 2 * skin
+let strandArea = Math.PI*(strandDiameter/2)**2
 
-// cross-section areas
-let areaWire = Math.PI * (wireDiameter/2)**2
-let areaSkin = Math.PI * (maxDiameter/2)**2
+// current density
+let J = 5 // A/mm²
 
-// strands required
-let strands = Math.max(1, Math.ceil(areaWire / areaSkin))
+let requiredArea = current / J
+
+let strands = Math.max(1, Math.ceil(requiredArea / strandArea))
 
 return {
 skinDepth: skin,
-maxStrandDiameter: maxDiameter,
+strandDiameter: strandDiameter,
 strands: strands
 }
 
