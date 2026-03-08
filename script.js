@@ -43,8 +43,8 @@ let result = calculateCoreSelection(
 Vin,
 freqk,
 P,
-material.value,
-coretype.value
+document.getElementById("material").value,
+document.getElementById("coretype").value
 )
 
 selectedCore.innerHTML = ""
@@ -156,7 +156,7 @@ secondaryWire.appendChild(opt.cloneNode(true))
 // STRANDS + COPPER LOSS + WINDOW FILL
 window.calculateStrands = function(){
 
-let core = cores[coretype.value]
+let core = cores[document.getElementById("coretype").value]
 .find(c=>c.name===selectedCore.value)
 
 let copper = calculateCopperLoss({

@@ -52,9 +52,11 @@ width:40%;
 .core-preview-box{
 
 background:#e6f2ff;
-padding:25px;
 border-radius:10px;
+padding:20px;
 text-align:center;
+position:sticky;
+top:20px;
 
 }
 
