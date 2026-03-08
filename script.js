@@ -5,13 +5,13 @@ function updateCoreImage(){
 let core=document.getElementById("coretype").value
 let img=document.getElementById("coreImage")
 
-if(core=="ETD") img.src="Pictures/etd.jpg"
-if(core=="EE") img.src="Pictures/ee.jpg"
-if(core=="PQ") img.src="Pictures/pq.jpg"
-if(core=="RM") img.src="Pictures/rm.png"
-if(core=="EP") img.src="Pictures/ep.jpg"
-if(core=="EFD") img.src="Pictures/efd.jpg"
-if(core=="Toroidal") img.src="Pictures/toroidal.jpg"
+if(core=="ETD") img.src="./Pictures/etd.jpg"
+if(core=="EE") img.src="./Pictures/ee.jpg"
+if(core=="PQ") img.src="./Pictures/pq.jpg"
+if(core=="RM") img.src="./Pictures/rm.png"
+if(core=="EP") img.src="./Pictures/ep.jpg"
+if(core=="EFD") img.src="./Pictures/efd.jpg"
+if(core=="Toroidal") img.src="./Pictures/torroidal.jpg"
 
 }
 
@@ -127,8 +127,6 @@ mat.k*Math.pow(freqk,mat.a)*Math.pow(Binput,mat.b)
 
 coreLossResults.innerHTML=
 `Estimated Core Loss: ${coreLoss.toFixed(3)} W/cm³`
-
-resultsData.coreLoss=coreLoss
 
 }
 

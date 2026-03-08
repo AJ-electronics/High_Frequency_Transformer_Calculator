@@ -8,9 +8,9 @@
 
 <link rel="stylesheet" href="style.css">
 
-<script src="data/materials.js"></script>
-<script src="data/cores.js"></script>
-<script src="data/awg.js"></script>
+<script src="./data/materials.js"></script>
+<script src="./data/cores.js"></script>
+<script src="./data/awg.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -20,7 +20,7 @@
 
 <div class="header">
 
-<img src="Pictures/logo.png" class="logo">
+<img src="./Pictures/logo.png" class="logo">
 
 <h1>High Frequency Transformer Calculator</h1>
 
@@ -51,6 +51,7 @@ Power Rating (VA)
 Core Type
 
 <select id="coretype" onchange="updateCoreImage()">
+
 <option value="ETD">ETD</option>
 <option value="EE">EE</option>
 <option value="PQ">PQ</option>
@@ -58,15 +59,19 @@ Core Type
 <option value="EP">EP</option>
 <option value="EFD">EFD</option>
 <option value="Toroidal">Toroidal</option>
+
 </select>
 
 Material
+
 <select id="material">
+
 <option>N87</option>
 <option>N97</option>
 <option>PC40</option>
 <option>3C90</option>
 <option>3F3</option>
+
 </select>
 
 <button onclick="calculate()">Calculate</button>
@@ -129,7 +134,7 @@ Download PDF
 
 <h3>Core Preview</h3>
 
-<img id="coreImage" src="Pictures/etd.jpg" class="core-preview">
+<img id="coreImage" src="./Pictures/etd.jpg" class="core-preview">
 
 </div>
 
