@@ -5,13 +5,13 @@ function updateCoreImage(){
 let core=document.getElementById("coretype").value
 let img=document.getElementById("coreImage")
 
-if(core=="ETD") img.src="./Pictures/etd.jpg"
-if(core=="EE") img.src="./Pictures/ee.jpg"
-if(core=="PQ") img.src="./Pictures/pq.jpg"
+if(core=="ETD") img.src="./Pictures/etd.png"
+if(core=="EE") img.src="./Pictures/ee.png"
+if(core=="PQ") img.src="./Pictures/pq.png"
 if(core=="RM") img.src="./Pictures/rm.png"
-if(core=="EP") img.src="./Pictures/ep.jpg"
-if(core=="EFD") img.src="./Pictures/efd.jpg"
-if(core=="Toroidal") img.src="./Pictures/torroidal.jpg"
+if(core=="EP") img.src="./Pictures/ep.png"
+if(core=="EFD") img.src="./Pictures/efd.png"
+if(core=="Toroidal") img.src="./Pictures/torroidal.png"
 
 }
 
