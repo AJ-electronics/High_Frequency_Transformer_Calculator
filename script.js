@@ -5,6 +5,7 @@ import {calculateCoreLoss} from "./calculations/coreLossCalculation.js"
 import {calculateCopperLoss} from "./calculations/copperLossCalculation.js"
 import {calculateWindowFill} from "./calculations/windowFillCalculation.js"
 import {calculateThermal} from "./calculations/thermalCalculation.js"
+import {calculateStrands} from "./calculations/strandCalculation.js"
 
 let resultsData = {}
 
@@ -38,7 +39,7 @@ const pdfBtn = document.getElementById("pdfBtn")
 
 const coreImage = document.getElementById("coreImage")
 
-// CORE CARD CLICK HANDLER
+// CORE BUTTON CLICK
 document.querySelectorAll(".core-btn").forEach(button => {
 
 button.addEventListener("click", () => {
@@ -60,7 +61,7 @@ button.classList.add("selected-core")
 })
 
 
-// MAIN CALCULATION
+// MAIN CORE SELECTION
 window.calculate = function(){
 
 let Vin = parseFloat(vin.value)
@@ -108,7 +109,6 @@ window.showCoreInfo = function(){
 let mat = materials[material.value]
 
 coreInfo.innerHTML=
-
 `
 Curie Temperature: ${mat.curie} °C<br>
 Maximum Flux Density: ${mat.bmax} T
@@ -145,17 +145,18 @@ resultsData.Np = turns.Np
 resultsData.Ns = turns.Ns
 
 turnResults.innerHTML =
-
 `Primary Turns: ${turns.Np}<br>
 Secondary Turns: ${turns.Ns}`
 
 
+// Magnetizing inductance
 let inductance = calculateInductance(turns.Np, core)
 
 inductanceResults.innerHTML =
 `Magnetizing Inductance: ${inductance.toFixed(2)} µH`
 
 
+// Core loss
 let coreLoss = calculateCoreLoss(
 material.value,
 parseFloat(freq.value),
@@ -170,7 +171,7 @@ resultsData.coreLoss = coreLoss
 }
 
 
-// WIRE POPULATION
+// POPULATE AWG LIST
 function populateWire(){
 
 primaryWire.innerHTML=""
@@ -193,7 +194,7 @@ secondaryWire.appendChild(opt.cloneNode(true))
 }
 
 
-// STRANDS + COPPER LOSS + WINDOW FILL
+// STRAND + COPPER LOSS + WINDOW FILL
 window.calculateStrands = function(){
 
 let core = cores[coretype.value]
@@ -209,34 +210,18 @@ let Is = P / Vout
 let wireP = parseFloat(primaryWire.value)
 let wireS = parseFloat(secondaryWire.value)
 
-// Calculate skin depth
-let rho = 1.72e-8
-let mu0 = 4*Math.PI*1e-7
-let f = parseFloat(freq.value)*1000
+let freqk = parseFloat(freq.value)
 
-let skin = Math.sqrt(rho/(Math.PI*f*mu0))
-skin *= 1000   // convert to mm
 
-let maxDiameter = 2*skin
+// Strand calculation using module
+let strandPrimary = calculateStrands(wireP, freqk)
+let strandSecondary = calculateStrands(wireS, freqk)
 
-// convert wire diameters to cross-sectional areas
-let areaWireP = Math.PI*(wireP/2)**2
-let areaWireS = Math.PI*(wireS/2)**2
+let strandsP = strandPrimary.strands
+let strandsS = strandSecondary.strands
 
-let areaSkin = Math.PI*(maxDiameter/2)**2
 
-// calculate strands needed
-let strandsP = Math.max(1, Math.ceil(areaWireP/areaSkin))
-let strandsS = Math.max(1, Math.ceil(areaWireS/areaSkin))
-// convert to cross-sectional areas
-let areaWireP = Math.PI*(wireP/2)**2
-let areaWireS = Math.PI*(wireS/2)**2
-
-let areaSkin = Math.PI*(maxDiameter/2)**2
-
-let strandsP = Math.max(1, Math.ceil(areaWireP/areaSkin))
-let strandsS = Math.max(1, Math.ceil(areaWireS/areaSkin))
-
+// Copper loss
 let loss = calculateCopperLoss(
 Ip,
 Is,
@@ -251,6 +236,7 @@ core
 
 strandResult.innerHTML =
 `
+Skin Depth: ${strandPrimary.skinDepth.toFixed(3)} mm<br>
 Primary Strands: ${strandsP}<br>
 Secondary Strands: ${strandsS}
 `
@@ -262,11 +248,13 @@ Secondary Current: ${Is.toFixed(3)} A<br>
 Copper Loss: ${loss.toFixed(3)} W
 `
 
+
+// Window fill
 let fill = calculateWindowFill(
 resultsData.Np,
 resultsData.Ns,
-parseFloat(primaryWire.value),
-parseFloat(secondaryWire.value),
+wireP,
+wireS,
 strandsP,
 strandsS,
 core
@@ -278,6 +266,8 @@ Window Fill Factor: ${(fill*100).toFixed(2)} %<br>
 Recommended: < 40 %
 `
 
+
+// Thermal
 let thermal = calculateThermal(loss,resultsData.coreLoss,core)
 
 designChecks.innerHTML +=
@@ -286,6 +276,7 @@ designChecks.innerHTML +=
 pdfBtn.style.display="block"
 
 }
+
 
 // PDF EXPORT
 window.generatePDF = function(){
