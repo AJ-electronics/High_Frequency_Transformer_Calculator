@@ -81,3 +81,25 @@ button:hover{
 background:#005fa3;
 
 }
+.description{
+
+background:white;
+margin:40px;
+padding:25px;
+border-radius:8px;
+box-shadow:0px 4px 10px rgba(0,0,0,0.2);
+line-height:1.6;
+
+}
+
+.description h2{
+
+color:#003366;
+
+}
+
+.description ul{
+
+margin-top:5px;
+
+}
