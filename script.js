@@ -214,8 +214,8 @@ let freqk = parseFloat(freq.value)
 
 
 // Strand calculation using module
-let strandPrimary = calculateStrands(wireP, freqk)
-let strandSecondary = calculateStrands(wireS, freqk)
+let strandPrimary = calculateStrands(Ip, freqk)
+let strandSecondary = calculateStrands(Is, freqk)
 
 let strandsP = strandPrimary.strands
 let strandsS = strandSecondary.strands
