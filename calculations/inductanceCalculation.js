@@ -1,9 +1,8 @@
-export function calculateInductance(Np,Ae,le){
+export function calculateInductance(Np, core){
 
-let mu0 = 4*Math.PI*1e-7
-let mur = 2000
+let Al = core.Al   // nH/turn²
 
-let L = (mu0*mur*Np*Np*Ae)/le
+let L = Al * Np * Np / 1000  // µH
 
 return L
 

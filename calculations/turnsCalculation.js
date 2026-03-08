@@ -1,14 +1,15 @@
-export function calculateTurns(Vin,Vout,freq,B,Ae){
+export function calculateTurns(Vin, Vout, f, B, core){
 
-let Np = Vin/(4*freq*B*Ae)
+let Ae = core.Ae * 1e-4   // cm² → m²
 
-let Ns = Np*(Vout/Vin)
+let Np = Vin / (4 * f * B * Ae)
+
+let ratio = Vout / Vin
+let Ns = Np * ratio
 
 return {
-
-Np:Math.round(Np),
-Ns:Math.round(Ns)
-
+Np: Math.ceil(Np),
+Ns: Math.ceil(Ns)
 }
 
 }

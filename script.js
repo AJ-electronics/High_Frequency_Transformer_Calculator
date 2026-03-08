@@ -123,11 +123,21 @@ window.calculateTurns = function(){
 let core = cores[coretype.value]
 .find(c => c.name === selectedCore.value)
 
+let Vin = parseFloat(vin.value)
+let Vout = parseFloat(vout.value)
+let f = parseFloat(freq.value) * 1000
+let B = parseFloat(Buser.value)
+
+if(isNaN(Vin) || isNaN(Vout) || isNaN(f) || !core){
+turnResults.innerHTML = "Enter valid Vin, Vout, Frequency and calculate core first"
+return
+}
+
 let turns = calculateTurns(
-parseFloat(vin.value),
-parseFloat(vout.value),
-parseFloat(freq.value),
-parseFloat(Buser.value),
+Vin,
+Vout,
+f,
+B,
 core
 )
 
